@@ -1,0 +1,185 @@
+{
+  "spacing": {
+    "description": "8px 기반 스페이싱 시스템",
+    "base": {
+      "value": "8px",
+      "description": "기준 단위"
+    },
+    "scale": {
+      "0": {
+        "value": "0",
+        "description": "없음"
+      },
+      "1": {
+        "value": "4px",
+        "description": "0.5x (아주 작은 간격)"
+      },
+      "2": {
+        "value": "8px",
+        "description": "1x (기본 작은 간격)"
+      },
+      "3": {
+        "value": "12px",
+        "description": "1.5x"
+      },
+      "4": {
+        "value": "16px",
+        "description": "2x (기본 중간 간격)"
+      },
+      "5": {
+        "value": "20px",
+        "description": "2.5x"
+      },
+      "6": {
+        "value": "24px",
+        "description": "3x (기본 큰 간격)"
+      },
+      "8": {
+        "value": "32px",
+        "description": "4x (섹션 간격)"
+      },
+      "10": {
+        "value": "40px",
+        "description": "5x"
+      },
+      "12": {
+        "value": "48px",
+        "description": "6x (컴포넌트 그룹 간격)"
+      },
+      "16": {
+        "value": "64px",
+        "description": "8x (큰 섹션 간격)"
+      },
+      "20": {
+        "value": "80px",
+        "description": "10x"
+      },
+      "24": {
+        "value": "96px",
+        "description": "12x (페이지 섹션)"
+      }
+    }
+  },
+  "radius": {
+    "none": {
+      "value": "0",
+      "description": "라운드 없음"
+    },
+    "sm": {
+      "value": "4px",
+      "description": "작은 라운드 (버튼 등)"
+    },
+    "md": {
+      "value": "8px",
+      "description": "중간 라운드 (카드 등)"
+    },
+    "lg": {
+      "value": "12px",
+      "description": "큰 라운드 (모달 등)"
+    },
+    "xl": {
+      "value": "16px",
+      "description": "아주 큰 라운드"
+    },
+    "2xl": {
+      "value": "24px",
+      "description": "특대 라운드"
+    },
+    "full": {
+      "value": "9999px",
+      "description": "완전 둥근 형태"
+    }
+  },
+  "shadow": {
+    "sm": {
+      "value": "0 1px 2px 0 rgba(0, 0, 0, 0.25)",
+      "description": "작은 그림자"
+    },
+    "md": {
+      "value": "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2)",
+      "description": "중간 그림자"
+    },
+    "lg": {
+      "value": "0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3)",
+      "description": "큰 그림자"
+    },
+    "xl": {
+      "value": "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4)",
+      "description": "아주 큰 그림자"
+    },
+    "glow": {
+      "primary": {
+        "value": "0 0 20px rgba(0, 122, 255, 0.3)",
+        "description": "Primary 글로우"
+      },
+      "success": {
+        "value": "0 0 20px rgba(52, 199, 89, 0.3)",
+        "description": "성공 글로우"
+      },
+      "xp": {
+        "value": "0 0 20px rgba(255, 215, 0, 0.4)",
+        "description": "XP 골드 글로우"
+      }
+    }
+  },
+  "breakpoint": {
+    "sm": {
+      "value": "640px",
+      "description": "모바일 (세로)"
+    },
+    "md": {
+      "value": "768px",
+      "description": "태블릿"
+    },
+    "lg": {
+      "value": "1024px",
+      "description": "노트북"
+    },
+    "xl": {
+      "value": "1280px",
+      "description": "데스크탑"
+    },
+    "2xl": {
+      "value": "1536px",
+      "description": "대형 모니터"
+    }
+  },
+  "zIndex": {
+    "hide": {
+      "value": "-1",
+      "description": "숨김"
+    },
+    "base": {
+      "value": "0",
+      "description": "기본"
+    },
+    "dropdown": {
+      "value": "1000",
+      "description": "드롭다운"
+    },
+    "sticky": {
+      "value": "1100",
+      "description": "고정 헤더"
+    },
+    "overlay": {
+      "value": "1300",
+      "description": "오버레이"
+    },
+    "modal": {
+      "value": "1400",
+      "description": "모달"
+    },
+    "popover": {
+      "value": "1500",
+      "description": "팝오버"
+    },
+    "tooltip": {
+      "value": "1600",
+      "description": "툴팁"
+    },
+    "toast": {
+      "value": "1700",
+      "description": "토스트 알림"
+    }
+  }
+}

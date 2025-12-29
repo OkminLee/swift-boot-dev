@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.design-tokens.org/1.0.0/design-tokens.schema.json",
+  "name": "SwiftBoot Design Tokens",
+  "version": "1.0.0",
+  "description": "SwiftBoot 프로젝트의 디자인 토큰 시스템",
+  "tokens": {
+    "colors": "./colors.json",
+    "typography": "./typography.json",
+    "spacing": "./spacing.json",
+    "animation": "./animation.json"
+  },
+  "meta": {
+    "designPhilosophy": "Magical IDE - Xcode/VS Code 스타일의 프로페셔널한 IDE + 게이미피케이션 오버레이",
+    "baseUnit": "8px",
+    "primaryFont": {
+      "mono": "JetBrains Mono",
+      "sans": "Inter"
+    },
+    "iconSet": "Lucide Icons",
+    "references": [
+      "Apple Human Interface Guidelines",
+      "VS Code Theme",
+      "Boot.dev"
+    ]
+  }
+}

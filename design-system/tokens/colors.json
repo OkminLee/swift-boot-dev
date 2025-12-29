@@ -1,0 +1,176 @@
+{
+  "color": {
+    "background": {
+      "primary": {
+        "value": "#1E1E1E",
+        "description": "메인 배경색"
+      },
+      "secondary": {
+        "value": "#252526",
+        "description": "사이드바/패널 배경"
+      },
+      "editor": {
+        "value": "#1E1E1E",
+        "description": "코드 에디터 배경"
+      },
+      "terminal": {
+        "value": "#0D1117",
+        "description": "터미널/콘솔 배경"
+      },
+      "elevated": {
+        "value": "#2D2D2D",
+        "description": "카드/모달 배경"
+      },
+      "hover": {
+        "value": "#3C3C3C",
+        "description": "호버 상태 배경"
+      }
+    },
+    "text": {
+      "primary": {
+        "value": "#D4D4D4",
+        "description": "기본 텍스트"
+      },
+      "secondary": {
+        "value": "#808080",
+        "description": "보조 텍스트"
+      },
+      "muted": {
+        "value": "#6B6B6B",
+        "description": "비활성화/힌트 텍스트"
+      },
+      "accent": {
+        "value": "#007AFF",
+        "description": "강조 텍스트 (링크 등)"
+      },
+      "inverse": {
+        "value": "#1E1E1E",
+        "description": "밝은 배경 위 텍스트"
+      }
+    },
+    "accent": {
+      "primary": {
+        "value": "#007AFF",
+        "description": "시스템 블루 (Apple HIG)"
+      },
+      "success": {
+        "value": "#34C759",
+        "description": "성공 상태"
+      },
+      "error": {
+        "value": "#FF3B30",
+        "description": "에러 상태"
+      },
+      "warning": {
+        "value": "#FF9500",
+        "description": "경고 상태"
+      },
+      "info": {
+        "value": "#5AC8FA",
+        "description": "정보 상태"
+      }
+    },
+    "gamification": {
+      "xp": {
+        "gold": {
+          "value": "#FFD700",
+          "description": "경험치 골드"
+        },
+        "glow": {
+          "value": "rgba(255, 215, 0, 0.3)",
+          "description": "XP 글로우 효과"
+        }
+      },
+      "gem": {
+        "purple": {
+          "value": "#AF52DE",
+          "description": "Gem 퍼플"
+        },
+        "glow": {
+          "value": "rgba(175, 82, 222, 0.3)",
+          "description": "Gem 글로우 효과"
+        }
+      },
+      "streak": {
+        "orange": {
+          "value": "#FF6B35",
+          "description": "연속 학습 오렌지"
+        },
+        "flame": {
+          "value": "#FF4500",
+          "description": "불꽃 효과"
+        }
+      },
+      "level": {
+        "gradient": {
+          "start": {
+            "value": "#667EEA",
+            "description": "레벨 그라데이션 시작"
+          },
+          "end": {
+            "value": "#764BA2",
+            "description": "레벨 그라데이션 끝"
+          }
+        }
+      },
+      "chest": {
+        "common": {
+          "value": "#8B7355",
+          "description": "일반 상자"
+        },
+        "rare": {
+          "value": "#3B82F6",
+          "description": "레어 상자"
+        },
+        "legendary": {
+          "value": "#F59E0B",
+          "description": "전설 상자"
+        }
+      }
+    },
+    "syntax": {
+      "keyword": {
+        "value": "#C678DD",
+        "description": "키워드 (let, var, func)"
+      },
+      "string": {
+        "value": "#98C379",
+        "description": "문자열"
+      },
+      "number": {
+        "value": "#D19A66",
+        "description": "숫자"
+      },
+      "comment": {
+        "value": "#5C6370",
+        "description": "주석"
+      },
+      "function": {
+        "value": "#61AFEF",
+        "description": "함수명"
+      },
+      "type": {
+        "value": "#E5C07B",
+        "description": "타입명"
+      },
+      "operator": {
+        "value": "#56B6C2",
+        "description": "연산자"
+      }
+    },
+    "border": {
+      "default": {
+        "value": "#3C3C3C",
+        "description": "기본 보더"
+      },
+      "focus": {
+        "value": "#007AFF",
+        "description": "포커스 보더"
+      },
+      "error": {
+        "value": "#FF3B30",
+        "description": "에러 보더"
+      }
+    }
+  }
+}

@@ -1,0 +1,297 @@
+/**
+ * SwiftBoot Design System - CSS Variables
+ *
+ * 이 파일은 디자인 토큰 JSON에서 생성된 CSS 변수입니다.
+ * "Magical IDE" 디자인 철학: 프로페셔널한 IDE + 게이미피케이션
+ */
+
+:root {
+  /* ==========================================
+   * 배경색 (Background)
+   * ========================================== */
+  --bg-primary: #1E1E1E;
+  --bg-secondary: #252526;
+  --bg-editor: #1E1E1E;
+  --bg-terminal: #0D1117;
+  --bg-elevated: #2D2D2D;
+  --bg-hover: #3C3C3C;
+
+  /* ==========================================
+   * 텍스트 (Text)
+   * ========================================== */
+  --text-primary: #D4D4D4;
+  --text-secondary: #808080;
+  --text-muted: #6B6B6B;
+  --text-accent: #007AFF;
+  --text-inverse: #1E1E1E;
+
+  /* ==========================================
+   * 악센트 컬러 (Accent)
+   * ========================================== */
+  --accent-primary: #007AFF;
+  --accent-success: #34C759;
+  --accent-error: #FF3B30;
+  --accent-warning: #FF9500;
+  --accent-info: #5AC8FA;
+
+  /* ==========================================
+   * 게이미피케이션 (Gamification)
+   * ========================================== */
+  /* XP */
+  --xp-gold: #FFD700;
+  --xp-glow: rgba(255, 215, 0, 0.3);
+
+  /* Gems */
+  --gem-purple: #AF52DE;
+  --gem-glow: rgba(175, 82, 222, 0.3);
+
+  /* Streak */
+  --streak-orange: #FF6B35;
+  --streak-flame: #FF4500;
+
+  /* Level */
+  --level-gradient-start: #667EEA;
+  --level-gradient-end: #764BA2;
+  --level-gradient: linear-gradient(135deg, var(--level-gradient-start) 0%, var(--level-gradient-end) 100%);
+
+  /* Chest */
+  --chest-common: #8B7355;
+  --chest-rare: #3B82F6;
+  --chest-legendary: #F59E0B;
+
+  /* ==========================================
+   * 구문 강조 (Syntax Highlighting)
+   * ========================================== */
+  --syntax-keyword: #C678DD;
+  --syntax-string: #98C379;
+  --syntax-number: #D19A66;
+  --syntax-comment: #5C6370;
+  --syntax-function: #61AFEF;
+  --syntax-type: #E5C07B;
+  --syntax-operator: #56B6C2;
+
+  /* ==========================================
+   * 보더 (Border)
+   * ========================================== */
+  --border-default: #3C3C3C;
+  --border-focus: #007AFF;
+  --border-error: #FF3B30;
+
+  /* ==========================================
+   * 폰트 (Typography)
+   * ========================================== */
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Menlo', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* 폰트 크기 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+  --font-size-5xl: 48px;
+
+  /* 폰트 굵기 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* 줄간격 */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-code: 1.6;
+
+  /* ==========================================
+   * 스페이싱 (Spacing) - 8px 기반
+   * ========================================== */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ==========================================
+   * 라운드 (Border Radius)
+   * ========================================== */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ==========================================
+   * 그림자 (Shadow)
+   * ========================================== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+
+  /* 글로우 */
+  --shadow-glow-primary: 0 0 20px rgba(0, 122, 255, 0.3);
+  --shadow-glow-success: 0 0 20px rgba(52, 199, 89, 0.3);
+  --shadow-glow-xp: 0 0 20px rgba(255, 215, 0, 0.4);
+
+  /* ==========================================
+   * 애니메이션 (Animation)
+   * ========================================== */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+  --duration-celebration: 1000ms;
+
+  /* 이징 */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* 트랜지션 */
+  --transition-default: all 250ms var(--ease-in-out);
+  --transition-fast: all 150ms var(--ease-in-out);
+  --transition-slow: all 350ms var(--ease-in-out);
+  --transition-color: color 150ms var(--ease-in-out), background-color 150ms var(--ease-in-out);
+  --transition-transform: transform 250ms var(--ease-in-out);
+  --transition-opacity: opacity 250ms var(--ease-in-out);
+
+  /* ==========================================
+   * Z-Index
+   * ========================================== */
+  --z-hide: -1;
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-overlay: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-tooltip: 1600;
+  --z-toast: 1700;
+
+  /* ==========================================
+   * 반응형 브레이크포인트 (참조용)
+   * ========================================== */
+  /*
+   * --breakpoint-sm: 640px;   // 모바일
+   * --breakpoint-md: 768px;   // 태블릿
+   * --breakpoint-lg: 1024px;  // 노트북
+   * --breakpoint-xl: 1280px;  // 데스크탑
+   * --breakpoint-2xl: 1536px; // 대형 모니터
+   */
+}
+
+/* ==========================================
+ * 키프레임 애니메이션
+ * ========================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px var(--xp-glow); }
+  50% { box-shadow: 0 0 20px var(--xp-gold); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 레벨업 파티클 효과 */
+@keyframes levelUpBurst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* XP 획득 숫자 애니메이션 */
+@keyframes xpGain {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-30px) scale(1.2);
+    opacity: 0;
+  }
+}

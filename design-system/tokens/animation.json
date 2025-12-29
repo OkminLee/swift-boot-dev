@@ -1,0 +1,144 @@
+{
+  "animation": {
+    "duration": {
+      "instant": {
+        "value": "0ms",
+        "description": "즉시"
+      },
+      "fast": {
+        "value": "150ms",
+        "description": "빠른 전환 (호버, 포커스)"
+      },
+      "normal": {
+        "value": "250ms",
+        "description": "일반 전환"
+      },
+      "slow": {
+        "value": "350ms",
+        "description": "느린 전환 (모달 열기)"
+      },
+      "slower": {
+        "value": "500ms",
+        "description": "더 느린 전환 (페이지 전환)"
+      },
+      "celebration": {
+        "value": "1000ms",
+        "description": "축하 애니메이션 (레벨업, 상자 개봉)"
+      }
+    },
+    "easing": {
+      "linear": {
+        "value": "linear",
+        "description": "선형"
+      },
+      "easeIn": {
+        "value": "cubic-bezier(0.4, 0, 1, 1)",
+        "description": "가속"
+      },
+      "easeOut": {
+        "value": "cubic-bezier(0, 0, 0.2, 1)",
+        "description": "감속"
+      },
+      "easeInOut": {
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "description": "가속 후 감속"
+      },
+      "bounce": {
+        "value": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "description": "바운스 (게이미피케이션)"
+      },
+      "spring": {
+        "value": "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+        "description": "스프링 (활기찬 느낌)"
+      }
+    },
+    "keyframes": {
+      "fadeIn": {
+        "description": "페이드 인",
+        "from": { "opacity": "0" },
+        "to": { "opacity": "1" }
+      },
+      "fadeOut": {
+        "description": "페이드 아웃",
+        "from": { "opacity": "1" },
+        "to": { "opacity": "0" }
+      },
+      "slideUp": {
+        "description": "아래에서 위로",
+        "from": { "transform": "translateY(20px)", "opacity": "0" },
+        "to": { "transform": "translateY(0)", "opacity": "1" }
+      },
+      "slideDown": {
+        "description": "위에서 아래로",
+        "from": { "transform": "translateY(-20px)", "opacity": "0" },
+        "to": { "transform": "translateY(0)", "opacity": "1" }
+      },
+      "scaleIn": {
+        "description": "스케일 인 (모달)",
+        "from": { "transform": "scale(0.95)", "opacity": "0" },
+        "to": { "transform": "scale(1)", "opacity": "1" }
+      },
+      "pulse": {
+        "description": "펄스 (알림)",
+        "0%": { "transform": "scale(1)" },
+        "50%": { "transform": "scale(1.05)" },
+        "100%": { "transform": "scale(1)" }
+      },
+      "shake": {
+        "description": "흔들림 (에러)",
+        "0%": { "transform": "translateX(0)" },
+        "25%": { "transform": "translateX(-5px)" },
+        "50%": { "transform": "translateX(5px)" },
+        "75%": { "transform": "translateX(-5px)" },
+        "100%": { "transform": "translateX(0)" }
+      },
+      "glow": {
+        "description": "글로우 펄스 (XP 획득)",
+        "0%": { "boxShadow": "0 0 5px rgba(255, 215, 0, 0.2)" },
+        "50%": { "boxShadow": "0 0 20px rgba(255, 215, 0, 0.6)" },
+        "100%": { "boxShadow": "0 0 5px rgba(255, 215, 0, 0.2)" }
+      },
+      "spin": {
+        "description": "회전 (로딩)",
+        "from": { "transform": "rotate(0deg)" },
+        "to": { "transform": "rotate(360deg)" }
+      },
+      "float": {
+        "description": "부유 (상자)",
+        "0%": { "transform": "translateY(0)" },
+        "50%": { "transform": "translateY(-10px)" },
+        "100%": { "transform": "translateY(0)" }
+      },
+      "confetti": {
+        "description": "컨페티 폭발 (정답)",
+        "note": "canvas-confetti 라이브러리 사용"
+      }
+    }
+  },
+  "transition": {
+    "default": {
+      "value": "all 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+      "description": "기본 트랜지션"
+    },
+    "fast": {
+      "value": "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+      "description": "빠른 트랜지션"
+    },
+    "slow": {
+      "value": "all 350ms cubic-bezier(0.4, 0, 0.2, 1)",
+      "description": "느린 트랜지션"
+    },
+    "color": {
+      "value": "color 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+      "description": "색상 트랜지션"
+    },
+    "transform": {
+      "value": "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+      "description": "변형 트랜지션"
+    },
+    "opacity": {
+      "value": "opacity 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+      "description": "투명도 트랜지션"
+    }
+  }
+}
