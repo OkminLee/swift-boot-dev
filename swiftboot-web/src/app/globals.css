@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+/* SwiftBoot Design System Variables */
+:root {
+  /* ==========================================
+   * 배경색 (Background)
+   * ========================================== */
+  --bg-primary: #1E1E1E;
+  --bg-secondary: #252526;
+  --bg-editor: #1E1E1E;
+  --bg-terminal: #0D1117;
+  --bg-elevated: #2D2D2D;
+  --bg-hover: #3C3C3C;
+
+  /* ==========================================
+   * 텍스트 (Text)
+   * ========================================== */
+  --text-primary: #D4D4D4;
+  --text-secondary: #808080;
+  --text-muted: #6B6B6B;
+  --text-accent: #007AFF;
+  --text-inverse: #1E1E1E;
+
+  /* ==========================================
+   * 악센트 컬러 (Accent)
+   * ========================================== */
+  --accent-primary: #007AFF;
+  --accent-success: #34C759;
+  --accent-error: #FF3B30;
+  --accent-warning: #FF9500;
+  --accent-info: #5AC8FA;
+
+  /* ==========================================
+   * 게이미피케이션 (Gamification)
+   * ========================================== */
+  --xp-gold: #FFD700;
+  --xp-glow: rgba(255, 215, 0, 0.3);
+  --gem-purple: #AF52DE;
+  --gem-glow: rgba(175, 82, 222, 0.3);
+  --streak-orange: #FF6B35;
+  --streak-flame: #FF4500;
+  --level-gradient-start: #667EEA;
+  --level-gradient-end: #764BA2;
+  --chest-common: #8B7355;
+  --chest-rare: #3B82F6;
+  --chest-legendary: #F59E0B;
+
+  /* ==========================================
+   * 구문 강조 (Syntax Highlighting)
+   * ========================================== */
+  --syntax-keyword: #C678DD;
+  --syntax-string: #98C379;
+  --syntax-number: #D19A66;
+  --syntax-comment: #5C6370;
+  --syntax-function: #61AFEF;
+  --syntax-type: #E5C07B;
+  --syntax-operator: #56B6C2;
+
+  /* ==========================================
+   * 보더 (Border)
+   * ========================================== */
+  --border-default: #3C3C3C;
+  --border-focus: #007AFF;
+  --border-error: #FF3B30;
+
+  /* ==========================================
+   * 스페이싱 (8px 기반)
+   * ========================================== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ==========================================
+   * 라운드 (Border Radius)
+   * ========================================== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ==========================================
+   * 그림자 (Shadow)
+   * ========================================== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-glow-primary: 0 0 20px rgba(0, 122, 255, 0.3);
+  --shadow-glow-xp: 0 0 20px rgba(255, 215, 0, 0.4);
+
+  /* ==========================================
+   * 애니메이션 (Animation)
+   * ========================================== */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Tailwind CSS v4 Theme */
+@theme inline {
+  /* Colors */
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-editor: var(--bg-editor);
+  --color-bg-terminal: var(--bg-terminal);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-hover: var(--bg-hover);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-accent: var(--text-accent);
+
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-success: var(--accent-success);
+  --color-accent-error: var(--accent-error);
+  --color-accent-warning: var(--accent-warning);
+
+  --color-xp-gold: var(--xp-gold);
+  --color-gem-purple: var(--gem-purple);
+  --color-streak-orange: var(--streak-orange);
+
+  --color-border: var(--border-default);
+  --color-border-focus: var(--border-focus);
+
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Menlo', monospace;
+}
+
+/* Base Styles */
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 122, 255, 0.3);
+  color: var(--text-primary);
+}
+
+/* Focus Ring */
+*:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px var(--xp-glow); }
+  50% { box-shadow: 0 0 20px var(--xp-gold); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
