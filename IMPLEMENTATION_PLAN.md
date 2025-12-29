@@ -2,9 +2,40 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 1.0
+**문서 버전:** 1.1
 **최종 수정일:** 2025-12-29
 **배포 형태:** 웹 애플리케이션
+
+---
+
+## 📊 진행 상황 요약
+
+| Phase | 설명 | 상태 | 진행률 |
+|-------|------|------|--------|
+| **Phase 0** | 디자인 시스템 | 🟡 진행중 | 60% |
+| **Phase 1A** | 백엔드 MVP | 🟡 진행중 | 70% |
+| **Phase 1B** | RCE 엔진 | ⬜ 대기 | 0% |
+| **Phase 1C** | 웹 클라이언트 MVP | 🟡 진행중 | 40% |
+| **Phase 2A** | 게이미피케이션 | ⬜ 대기 | 0% |
+| **Phase 2B** | 콘텐츠 & 폴리싱 | ⬜ 대기 | 0% |
+| **Phase 2C** | 배포 | ⬜ 대기 | 0% |
+
+### 완료된 주요 작업
+
+- ✅ 디자인 토큰 정의 (colors, typography, spacing, animation)
+- ✅ Tailwind CSS 프리셋 및 CSS 변수
+- ✅ Vapor 프로젝트 구조 및 의존성 설정
+- ✅ Fluent 모델 (User, Track, Course, Chapter, Lesson, UserProgress)
+- ✅ 기본 컨트롤러 (Auth, User, Track, Course, Lesson)
+- ✅ Docker Compose (PostgreSQL, Redis)
+- ✅ Next.js 15 프로젝트 초기화
+- ✅ 랜딩 페이지, 로그인 페이지, 대시보드 레이아웃
+
+### 다음 우선순위 작업
+
+1. 🔜 GitHub OAuth 구현 (백엔드 + 프론트엔드)
+2. 🔜 Monaco Editor 통합
+3. 🔜 RCE 엔진 (Docker 기반 코드 실행)
 
 ---
 
@@ -219,10 +250,10 @@ Phase 2C: 배포                  [Week 17-18]  ████
 #### Week 1: 디자인 토큰 & 컴포넌트 설계
 
 - [ ] Figma 프로젝트 생성
-- [ ] 색상 팔레트 정의
-- [ ] 타이포그래피 스케일 정의
-- [ ] 스페이싱/그리드 시스템 (8px 기반)
-- [ ] 아이콘 세트 선정 (Lucide Icons)
+- [x] 색상 팔레트 정의 *(design-system/tokens/colors.json)*
+- [x] 타이포그래피 스케일 정의 *(design-system/tokens/typography.json)*
+- [x] 스페이싱/그리드 시스템 (8px 기반) *(design-system/tokens/spacing.json)*
+- [x] 아이콘 세트 선정 (Lucide Icons)
 
 #### Week 2: UI 컴포넌트 디자인
 
@@ -231,12 +262,12 @@ Phase 2C: 배포                  [Week 17-18]  ████
 - [ ] XPBar / LevelBadge
 - [ ] ChestModal (개봉 애니메이션 스펙)
 - [ ] 전체 화면 플로우 프로토타입
-- [ ] 반응형 브레이크포인트 정의
+- [x] 반응형 브레이크포인트 정의 *(design-system/tokens/spacing.json)*
 
 **산출물:**
-- Figma 컴포넌트 라이브러리
-- 디자인 토큰 JSON
-- 인터랙션 스펙 문서
+- [ ] Figma 컴포넌트 라이브러리
+- [x] 디자인 토큰 JSON *(design-system/tokens/)*
+- [ ] 인터랙션 스펙 문서
 
 ---
 
@@ -244,10 +275,10 @@ Phase 2C: 배포                  [Week 17-18]  ████
 
 #### Week 3: 프로젝트 세팅
 
-- [ ] Vapor 프로젝트 초기화
-- [ ] Docker Compose 설정 (PostgreSQL, Redis)
-- [ ] Fluent 마이그레이션 설정
-- [ ] 기본 디렉토리 구조
+- [x] Vapor 프로젝트 초기화 *(SwiftBootServer/Package.swift)*
+- [x] Docker Compose 설정 (PostgreSQL, Redis) *(SwiftBootServer/docker-compose.yml)*
+- [x] Fluent 마이그레이션 설정 *(SwiftBootServer/Sources/App/Migrations/)*
+- [x] 기본 디렉토리 구조 *(SwiftBootServer/Sources/App/)*
 
 ```
 SwiftBootServer/
@@ -264,28 +295,28 @@ SwiftBootServer/
 └── docker-compose.yml
 ```
 
-- [ ] 데이터베이스 스키마 설계
+- [x] 데이터베이스 스키마 설계 *(SwiftBootServer/Sources/App/Models/)*
 
 ```sql
--- 핵심 테이블
-users (id, username, email, github_id, total_xp, level, gems, created_at)
-tracks (id, title, description, order)
-courses (id, track_id, title, description, order, prerequisite_id)
-chapters (id, course_id, title, order)
-lessons (id, chapter_id, title, content, difficulty, xp_reward, order)
-user_progress (user_id, lesson_id, status, submitted_code, completed_at)
+-- 핵심 테이블 (구현 완료)
+users (id, username, email, github_id, total_xp, level, gems, created_at) ✓
+tracks (id, title, description, order) ✓
+courses (id, track_id, title, description, order, prerequisite_id) ✓
+chapters (id, course_id, title, order) ✓
+lessons (id, chapter_id, title, content, difficulty, xp_reward, order) ✓
+user_progress (user_id, lesson_id, status, submitted_code, completed_at) ✓
 inventory (id, user_id, item_type, quantity)
 achievements (id, user_id, achievement_type, unlocked_at)
 ```
 
 #### Week 4: 인증 시스템
 
-- [ ] GitHub OAuth 2.0 연동
+- [ ] GitHub OAuth 2.0 연동 *(AuthController 스캐폴딩만 완료)*
 - [ ] JWT Access Token (15분)
 - [ ] JWT Refresh Token (7일)
 - [ ] 토큰 갱신 엔드포인트
 - [ ] Rate Limiting 미들웨어
-- [ ] CORS 설정
+- [x] CORS 설정 *(SwiftBootServer/Sources/App/configure.swift)*
 
 **API 엔드포인트:**
 ```
@@ -364,10 +395,10 @@ WS     /ws/execution      (실시간 결과 스트리밍)
 
 #### Week 8-9: Next.js 프로젝트 세팅
 
-- [ ] Next.js 14 프로젝트 생성 (App Router)
-- [ ] TypeScript 설정
-- [ ] Tailwind CSS + 커스텀 테마
-- [ ] 디렉토리 구조
+- [x] Next.js 15 프로젝트 생성 (App Router) *(swiftboot-web/)*
+- [x] TypeScript 설정 *(swiftboot-web/tsconfig.json)*
+- [x] Tailwind CSS + 커스텀 테마 *(swiftboot-web/src/app/globals.css)*
+- [x] 디렉토리 구조 *(swiftboot-web/src/app/)*
 
 ```
 swiftboot-web/
@@ -424,7 +455,7 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 
 #### Week 11: 학습 플로우 UI
 
-- [ ] 대시보드 (코스 목록)
+- [x] 대시보드 (코스 목록) *(swiftboot-web/src/app/(dashboard)/courses/page.tsx)*
 - [ ] 코스 상세 (챕터/레슨 목록)
 - [ ] 레슨 화면 (Split View)
   - [ ] 좌측: 학습 콘텐츠 (MDX 렌더링)
