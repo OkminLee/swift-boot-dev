@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: swiftboot-postgres
+    environment:
+      POSTGRES_USER: swiftboot
+      POSTGRES_PASSWORD: swiftboot
+      POSTGRES_DB: swiftboot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swiftboot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (Cache & Job Queue)
+  redis:
+    image: redis:7-alpine
+    container_name: swiftboot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Vapor App (Development)
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: swiftboot-api
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     DATABASE_HOST: postgres
+  #     DATABASE_PORT: 5432
+  #     DATABASE_USERNAME: swiftboot
+  #     DATABASE_PASSWORD: swiftboot
+  #     DATABASE_NAME: swiftboot
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

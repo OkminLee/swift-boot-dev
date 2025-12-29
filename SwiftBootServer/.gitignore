@@ -1,0 +1,20 @@
+# Xcode
+.DS_Store
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+docker-compose.override.yml
