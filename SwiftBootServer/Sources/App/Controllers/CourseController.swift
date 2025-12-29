@@ -31,11 +31,14 @@ struct CourseController: RouteCollection {
         guard let course = try await Course.query(on: req.db)
             .filter(\.$id == courseId)
             .filter(\.$isPublished == true)
-            .with(\.$chapters) { chapter in
-                chapter.with(\.$lessons)
-            }
+            .with(\.$chapters)
             .first() else {
             throw Abort(.notFound)
+        }
+
+        // 각 챕터의 레슨을 별도로 로드
+        for chapter in course.chapters {
+            try await chapter.$lessons.load(on: req.db)
         }
 
         return CourseDetailResponse(from: course)
