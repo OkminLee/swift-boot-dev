@@ -1,6 +1,34 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { redirectToGitHub } from "@/lib/github-oauth";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // 이미 로그인된 경우 대시보드로 리다이렉트
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace("/courses");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  const handleGitHubLogin = () => {
+    redirectToGitHub();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
+        <div className="animate-spin w-8 h-8 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
       <div className="max-w-md w-full mx-4">
@@ -25,11 +53,8 @@ export default function LoginPage() {
 
           {/* GitHub OAuth Button */}
           <button
-            className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[#24292e] text-white rounded-xl hover:bg-[#2f363d] transition-colors font-medium"
-            onClick={() => {
-              // TODO: GitHub OAuth 연동
-              console.log("GitHub OAuth");
-            }}
+            onClick={handleGitHubLogin}
+            className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[#24292e] text-white rounded-xl hover:bg-[#2f363d] transition-colors font-medium cursor-pointer"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path
