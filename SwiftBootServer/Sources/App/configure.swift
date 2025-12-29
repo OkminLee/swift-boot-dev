@@ -1,5 +1,6 @@
 import Fluent
 import FluentPostgresDriver
+import JWT
 import Redis
 import Vapor
 
@@ -43,6 +44,10 @@ func configure(_ app: Application) async throws {
         port: Environment.get("REDIS_PORT").flatMap(Int.init) ?? 6379
     )
 
+    // MARK: - JWT
+    let jwtSecret = Environment.get("JWT_SECRET") ?? "swiftboot-dev-secret-change-in-production"
+    app.jwt.signers.use(.hs256(key: jwtSecret))
+
     // MARK: - Migrations
     app.migrations.add(CreateUser())
     app.migrations.add(CreateTrack())
@@ -50,6 +55,8 @@ func configure(_ app: Application) async throws {
     app.migrations.add(CreateChapter())
     app.migrations.add(CreateLesson())
     app.migrations.add(CreateUserProgress())
+    app.migrations.add(CreateRefreshToken())
+    app.migrations.add(SeedContent())
 
     // MARK: - Routes
     try routes(app)
