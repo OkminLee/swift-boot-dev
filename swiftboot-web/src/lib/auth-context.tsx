@@ -8,10 +8,11 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { api, User } from "./api";
+import { api, User, UserStats } from "./api";
 
 interface AuthContextType {
   user: User | null;
+  stats: UserStats | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (code: string) => Promise<void>;
@@ -23,14 +24,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshUser = useCallback(async () => {
     try {
-      const userData = await api.getCurrentUser();
+      const [userData, userStats] = await Promise.all([
+        api.getCurrentUser(),
+        api.getUserStats().catch(() => null),
+      ]);
       setUser(userData);
+      setStats(userStats);
     } catch {
       setUser(null);
+      setStats(null);
       api.clearTokens();
     }
   }, []);
@@ -50,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await api.logout();
       setUser(null);
+      setStats(null);
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        stats,
         isLoading,
         isAuthenticated: !!user,
         login,

@@ -79,6 +79,33 @@ export interface SubmissionResponse {
   xpEarned?: number;
 }
 
+// Progress types
+export type ProgressStatus = "notStarted" | "inProgress" | "completed";
+
+export interface ProgressResponse {
+  lessonId: string;
+  status: ProgressStatus;
+  completedAt: string | null;
+  xpEarned: number;
+}
+
+export interface UserStats {
+  level: number;
+  totalXp: number;
+  xpToNextLevel: number;
+  levelProgress: number;
+  gems: number;
+  streakDays: number;
+  completedLessons: number;
+  totalLessons: number;
+}
+
+export interface CourseProgress {
+  courseId: string;
+  completedLessons: number;
+  totalLessons: number;
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -206,6 +233,18 @@ class ApiClient {
   // User
   async getCurrentUser(): Promise<User> {
     return this.request<User>("/users/me");
+  }
+
+  async getUserStats(): Promise<UserStats> {
+    return this.request<UserStats>("/users/me/stats");
+  }
+
+  async getUserProgress(): Promise<ProgressResponse[]> {
+    return this.request<ProgressResponse[]>("/users/me/progress");
+  }
+
+  async getCourseProgress(): Promise<CourseProgress[]> {
+    return this.request<CourseProgress[]>("/users/me/progress/courses");
   }
 
   // 인증 상태 확인
