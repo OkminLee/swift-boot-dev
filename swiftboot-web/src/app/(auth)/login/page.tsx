@@ -3,25 +3,25 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/stores/auth-store";
 import { redirectToGitHub } from "@/lib/github-oauth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isInitialized } = useAuth();
 
-  // 이미 로그인된 경우 대시보드로 리다이렉트
+  // 초기화 완료 후, 이미 로그인된 경우 대시보드로 리다이렉트
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (isInitialized && isAuthenticated) {
       router.replace("/courses");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isInitialized, router]);
 
   const handleGitHubLogin = () => {
     redirectToGitHub();
   };
 
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
         <div className="animate-spin w-8 h-8 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full" />

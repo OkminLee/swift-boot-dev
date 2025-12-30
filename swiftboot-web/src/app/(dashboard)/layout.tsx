@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/stores/auth-store";
 
 export default function DashboardLayout({
   children,
@@ -11,22 +11,22 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { user, stats, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, stats, isAuthenticated, isLoading, isInitialized, logout } = useAuth();
 
-  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+  // 초기화 완료 후, 인증되지 않은 경우 로그인 페이지로 리다이렉트
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (isInitialized && !isAuthenticated) {
       router.replace("/login");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isInitialized, router]);
 
   const handleLogout = async () => {
     await logout();
     router.replace("/");
   };
 
-  // 로딩 중
-  if (isLoading) {
+  // 초기화 중 또는 로딩 중
+  if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
         <div className="animate-spin w-8 h-8 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full" />

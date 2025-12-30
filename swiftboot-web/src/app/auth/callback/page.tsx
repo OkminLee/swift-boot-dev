@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/stores/auth-store";
 import { validateState } from "@/lib/github-oauth";
 
 function CallbackContent() {
