@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 1.3
+**문서 버전:** 1.4
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -13,9 +13,9 @@
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
 | **Phase 0** | 디자인 시스템 | 🟡 진행중 | 70% |
-| **Phase 1A** | 백엔드 MVP | 🟢 거의완료 | 95% |
+| **Phase 1A** | 백엔드 MVP | 🟢 거의완료 | 98% |
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
-| **Phase 1C** | 웹 클라이언트 MVP | 🟡 진행중 | 70% |
+| **Phase 1C** | 웹 클라이언트 MVP | 🟢 거의완료 | 90% |
 | **Phase 2A** | 게이미피케이션 | ⬜ 대기 | 0% |
 | **Phase 2B** | 콘텐츠 & 폴리싱 | ⬜ 대기 | 0% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
@@ -41,13 +41,18 @@
   - DockerRunner: 보안 격리 컨테이너 실행 (--network none, --memory 128m)
   - CodeExecutionService: 코드 실행, 결과 평가, XP 지급
   - 정답/오답/타임아웃/컴파일에러 처리
+- ✅ **사용자 진행률 시스템** (백엔드 + 프론트엔드)
+  - 코스별 진행률 API (GET /users/me/progress/courses)
+  - 코스 상세 페이지: 레슨별 완료 체크마크, 챕터/코스 진행률 바
+  - 코스 목록 페이지: 진행률 바, 완료 뱃지
+  - 사이드바: 완료 레슨 수, XP 진행률 표시
 
 ### 다음 우선순위 작업
 
 1. 🔜 추가 언어 지원 (Python, Go, JavaScript Docker 이미지)
 2. 🔜 Rate Limiting 미들웨어
-3. 🔜 사용자 진행률 UI 표시
-4. 🔜 게이미피케이션 UI (XP바, 레벨업 효과)
+3. 🔜 게이미피케이션 UI (레벨업 효과, Confetti)
+4. 🔜 Zustand 전역 상태 관리
 
 ---
 
@@ -469,7 +474,7 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 - [x] 레슨 화면 (Split View) *(swiftboot-web/src/app/learn/[lessonId]/page.tsx)*
   - [x] 좌측: 학습 콘텐츠 (ReactMarkdown + remark-gfm)
   - [x] 우측: 코드 에디터 + 결과 패널
-- [ ] 진행률 표시 (UserProgress 연동 필요)
+- [x] 진행률 표시 *(UserProgress API 연동, 코스/레슨 완료 상태 UI)*
 - [x] 반응형 레이아웃 (lg:grid-cols-2)
 
 **산출물:**
@@ -482,11 +487,11 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 
 #### Week 12: XP/레벨 시스템 UI
 
-- [ ] XP 프로그레스 바 컴포넌트
-- [ ] 레벨 뱃지 컴포넌트
+- [x] XP 프로그레스 바 컴포넌트 *(사이드바에 구현)*
+- [x] 레벨 뱃지 컴포넌트 *(사이드바에 구현)*
 - [ ] 레벨업 모달 (애니메이션)
-- [ ] Streak 표시 (연속 학습)
-- [ ] 사이드바 프로필 위젯
+- [x] Streak 표시 (연속 학습) *(사이드바에 구현)*
+- [x] 사이드바 프로필 위젯 *(대시보드 레이아웃에 구현)*
 
 **레벨링 공식:**
 ```
@@ -703,6 +708,7 @@ jobs:
 | 1.0 | 2025-12-29 | 최초 작성 (웹 배포 기준) |
 | 1.2 | 2025-12-30 | 진행상황 대규모 업데이트: GitHub OAuth 완료, JWT 인증 완료, Monaco Editor 통합 완료, 코스/레슨 UI 완료 |
 | 1.3 | 2025-12-30 | Phase 1B RCE 엔진 완료: Docker 기반 Swift 코드 실행, 보안 격리, 결과 평가 |
+| 1.4 | 2025-12-30 | 사용자 진행률 시스템 완료: 코스별 진행률 API, 레슨 완료 UI, 사이드바 통계 |
 
 ---
 
