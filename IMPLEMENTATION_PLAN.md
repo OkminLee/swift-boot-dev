@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 2.3
+**문서 버전:** 2.4
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -17,7 +17,7 @@
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
 | **Phase 1C** | 웹 클라이언트 MVP | ✅ 완료 | 100% |
 | **Phase 2A** | 게이미피케이션 | ✅ 완료 | 100% |
-| **Phase 2B** | 콘텐츠 & 폴리싱 | 🟡 진행중 | 60% |
+| **Phase 2B** | 콘텐츠 & 폴리싱 | 🟡 진행중 | 70% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
 
 ### 완료된 주요 작업
@@ -107,12 +107,22 @@
   - 레벨업 시 팡파레 (C5→E5→G5→C6 + 글리터)
   - 사운드 on/off 토글 (사이드바, localStorage 저장)
   - sound-store.ts: Zustand 상태 관리
+- ✅ **MDX 렌더링 및 커스텀 컴포넌트**
+  - next-mdx-remote, remark-directive 통합
+  - Hint (접기/펼치기), Warning, Info 박스 컴포넌트
+  - CodeBlock (복사 버튼 포함)
+  - MdxRenderer 컴포넌트로 레슨 콘텐츠 렌더링
 
 ### 다음 우선순위 작업
 
-1. 🔜 XP Potion, 코스메틱 아이템 추가
+1. 🔜 에러 바운더리 및 안정성 개선
 2. 🔜 DataSwift 코스 추가 (데이터 분석 기초)
-3. 🔜 MDX 렌더링 설정 및 커스텀 컴포넌트 (Hint, Warning 박스)
+3. 🔜 Lighthouse 성능 최적화
+
+### 낮은 우선순위 (Backlog)
+
+- ⏳ XP Potion, 코스메틱 아이템 추가
+- ⏳ E2E 테스트 (Playwright)
 
 ---
 
@@ -780,6 +790,7 @@ jobs:
 | 2.1 | 2025-12-30 | **Chest 시스템 완성**: 백엔드 API (Chest/UserChest 모델, ChestController), 레슨 완료 시 확률 기반 Chest 획득, 자동 개봉 모달 |
 | 2.2 | 2025-12-30 | **추가 코스 콘텐츠**: Swifty 2.0 (5 chapters, 20 lessons, 650 XP), PixelQuest (6 chapters, 23 lessons, 825 XP) - Phase 2B 진행률 60% |
 | 2.3 | 2025-12-30 | **인벤토리 Chest 개봉 UI**: 미개봉 Chest 목록 조회, 클릭 시 개봉 API 연동, 실제 보상 표시, 사용자 상태 자동 갱신 |
+| 2.4 | 2025-12-30 | **MDX 렌더링 구현**: next-mdx-remote/remark-directive 통합, Hint/Warning/Info/CodeBlock 컴포넌트, Phase 2B 진행률 70% |
 
 ---
 
