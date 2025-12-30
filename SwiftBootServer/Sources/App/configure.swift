@@ -66,6 +66,7 @@ func configure(_ app: Application) async throws {
     app.migrations.add(CreateChest())
     app.migrations.add(CreateUserChest())
     app.migrations.add(SeedChest())
+    app.migrations.add(UpdateLessonWithMdxComponents())
 
     // MARK: - Routes
     try routes(app)
