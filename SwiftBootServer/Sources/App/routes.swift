@@ -30,4 +30,7 @@ func routes(_ app: Application) throws {
     // Shop routes
     try api.register(collection: ShopController())
     try api.register(collection: InventoryController())
+
+    // Chest routes
+    try api.register(collection: ChestController())
 }
