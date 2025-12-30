@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import confetti from "canvas-confetti";
+import { playLevelUp } from "@/lib/sounds";
 
 interface LevelUpModalProps {
   isOpen: boolean;
@@ -51,6 +52,7 @@ export function LevelUpModal({ isOpen, newLevel, onClose }: LevelUpModalProps) {
   useEffect(() => {
     if (isOpen) {
       fireLevelUpConfetti();
+      playLevelUp();
     }
   }, [isOpen, fireLevelUpConfetti]);
 

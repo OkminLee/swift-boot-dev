@@ -6,6 +6,7 @@ import { api, Lesson, SubmissionResponse, Language, InventoryItem, SeerStoneResp
 import { CodeEditor, OutputViewer } from "@/components/CodeEditor";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 import { useAuthStore } from "@/stores/auth-store";
+import { playSuccess, playError } from "@/lib/sounds";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -77,10 +78,12 @@ export default function LessonPage() {
 
     if (result.status === "success" && result.isCorrect) {
       fireConfetti();
+      playSuccess();
       // XP 획득 시 사용자 정보 새로고침
       refreshUser();
     } else if (result.status === "failure") {
       setIsShaking(true);
+      playError();
       setTimeout(() => setIsShaking(false), 500);
     }
   }, [result, fireConfetti, refreshUser]);

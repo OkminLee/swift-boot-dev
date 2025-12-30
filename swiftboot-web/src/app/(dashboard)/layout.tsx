@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/stores/auth-store";
+import { useSoundStore } from "@/stores/sound-store";
+import { playSuccess } from "@/lib/sounds";
 
 export default function DashboardLayout({
   children,
@@ -12,6 +14,14 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const { user, stats, isAuthenticated, isLoading, isInitialized, logout } = useAuth();
+  const soundEnabled = useSoundStore((state) => state.soundEnabled);
+  const toggleSound = useSoundStore((state) => state.toggleSound);
+  const initializeSound = useSoundStore((state) => state.initialize);
+
+  // 사운드 설정 초기화
+  useEffect(() => {
+    initializeSound();
+  }, [initializeSound]);
 
   // 초기화 완료 후, 인증되지 않은 경우 로그인 페이지로 리다이렉트
   useEffect(() => {
@@ -19,6 +29,15 @@ export default function DashboardLayout({
       router.replace("/login");
     }
   }, [isAuthenticated, isInitialized, router]);
+
+  // 사운드 토글 핸들러
+  const handleToggleSound = () => {
+    toggleSound();
+    // 사운드 켜질 때 피드백 소리 재생
+    if (!soundEnabled) {
+      setTimeout(() => playSuccess(), 50);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -86,6 +105,29 @@ export default function DashboardLayout({
             <span>👤</span>
             <span>프로필</span>
           </Link>
+
+          {/* 사운드 토글 */}
+          <button
+            onClick={handleToggleSound}
+            className="flex items-center justify-between w-full px-3 py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
+            title={soundEnabled ? "사운드 끄기" : "사운드 켜기"}
+          >
+            <div className="flex items-center gap-3">
+              <span>{soundEnabled ? "🔊" : "🔇"}</span>
+              <span>사운드</span>
+            </div>
+            <div
+              className={`w-8 h-5 rounded-full transition-colors flex items-center px-0.5 ${
+                soundEnabled ? "bg-[var(--accent-primary)]" : "bg-[var(--bg-tertiary)]"
+              }`}
+            >
+              <div
+                className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                  soundEnabled ? "translate-x-3" : "translate-x-0"
+                }`}
+              />
+            </div>
+          </button>
         </nav>
 
         {/* User Stats */}
