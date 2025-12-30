@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 1.4
+**문서 버전:** 1.5
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -13,7 +13,7 @@
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
 | **Phase 0** | 디자인 시스템 | 🟡 진행중 | 70% |
-| **Phase 1A** | 백엔드 MVP | 🟢 거의완료 | 98% |
+| **Phase 1A** | 백엔드 MVP | ✅ 완료 | 100% |
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
 | **Phase 1C** | 웹 클라이언트 MVP | 🟢 거의완료 | 90% |
 | **Phase 2A** | 게이미피케이션 | ⬜ 대기 | 0% |
@@ -50,9 +50,8 @@
 ### 다음 우선순위 작업
 
 1. 🔜 추가 언어 지원 (Python, Go, JavaScript Docker 이미지)
-2. 🔜 Rate Limiting 미들웨어
-3. 🔜 게이미피케이션 UI (레벨업 효과, Confetti)
-4. 🔜 Zustand 전역 상태 관리
+2. 🔜 게이미피케이션 UI (레벨업 효과, Confetti)
+3. 🔜 Zustand 전역 상태 관리
 
 ---
 
@@ -332,7 +331,7 @@ achievements (id, user_id, achievement_type, unlocked_at)
 - [x] JWT Access Token (15분) *(DTOs/AuthDTOs.swift - AccessTokenPayload)*
 - [x] JWT Refresh Token (7일) *(Models/RefreshToken.swift, Migrations/CreateRefreshToken.swift)*
 - [x] 토큰 갱신 엔드포인트 *(POST /auth/refresh)*
-- [ ] Rate Limiting 미들웨어
+- [x] Rate Limiting 미들웨어 *(Middleware/RateLimitMiddleware.swift)*
 - [x] CORS 설정 *(SwiftBootServer/Sources/App/configure.swift)*
 - [x] JWTAuthMiddleware *(SwiftBootServer/Sources/App/Middleware/JWTAuthMiddleware.swift)*
 - [x] UserController *(GET /users/me, GET /users/me/stats)*
@@ -709,6 +708,7 @@ jobs:
 | 1.2 | 2025-12-30 | 진행상황 대규모 업데이트: GitHub OAuth 완료, JWT 인증 완료, Monaco Editor 통합 완료, 코스/레슨 UI 완료 |
 | 1.3 | 2025-12-30 | Phase 1B RCE 엔진 완료: Docker 기반 Swift 코드 실행, 보안 격리, 결과 평가 |
 | 1.4 | 2025-12-30 | 사용자 진행률 시스템 완료: 코스별 진행률 API, 레슨 완료 UI, 사이드바 통계 |
+| 1.5 | 2025-12-30 | Phase 1A 완료: Redis 기반 Rate Limiting 미들웨어 (IP/사용자별, 엔드포인트별 설정) |
 
 ---
 
