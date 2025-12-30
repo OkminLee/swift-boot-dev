@@ -157,6 +157,7 @@ struct SubmissionResponse: Content {
     let output: String?
     let isCorrect: Bool?
     let xpEarned: Int?
+    let earnedChest: EarnedChestInfo?
 
     init(
         lessonId: UUID,
@@ -164,7 +165,8 @@ struct SubmissionResponse: Content {
         message: String,
         output: String? = nil,
         isCorrect: Bool? = nil,
-        xpEarned: Int? = nil
+        xpEarned: Int? = nil,
+        earnedChest: EarnedChestInfo? = nil
     ) {
         self.lessonId = lessonId
         self.status = status
@@ -172,7 +174,15 @@ struct SubmissionResponse: Content {
         self.output = output
         self.isCorrect = isCorrect
         self.xpEarned = xpEarned
+        self.earnedChest = earnedChest
     }
+}
+
+struct EarnedChestInfo: Content {
+    let id: UUID
+    let name: String
+    let rarity: String
+    let icon: String
 }
 
 enum SubmissionStatus: String, Codable {

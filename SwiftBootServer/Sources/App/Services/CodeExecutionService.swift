@@ -106,13 +106,16 @@ struct CodeExecutionService {
 
         // 7. 정답인 경우 진행 상황 업데이트
         var xpEarned: Int? = nil
+        var earnedChest: EarnedChestInfo? = nil
         if isCorrect {
-            xpEarned = try await updateProgress(
+            let progressResult = try await updateProgress(
                 userId: userId,
                 lesson: lesson,
                 code: submission.code,
                 db: db
             )
+            xpEarned = progressResult.xpEarned
+            earnedChest = progressResult.earnedChest
         }
 
         return SubmissionResponse(
@@ -121,7 +124,8 @@ struct CodeExecutionService {
             message: isCorrect ? "정답입니다!" : "출력이 예상과 다릅니다.",
             output: String(result.stdout.prefix(2000)),
             isCorrect: isCorrect,
-            xpEarned: xpEarned
+            xpEarned: xpEarned,
+            earnedChest: earnedChest
         )
     }
 
@@ -149,14 +153,22 @@ struct CodeExecutionService {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    /// 진행 상황 업데이트 결과
+    struct ProgressResult {
+        let xpEarned: Int
+        let earnedChest: EarnedChestInfo?
+    }
+
     /// 진행 상황 업데이트 및 XP 지급
     private func updateProgress(
         userId: UUID,
         lesson: Lesson,
         code: String,
         db: Database
-    ) async throws -> Int {
-        guard let lessonId = lesson.id else { return 0 }
+    ) async throws -> ProgressResult {
+        guard let lessonId = lesson.id else {
+            return ProgressResult(xpEarned: 0, earnedChest: nil)
+        }
 
         // 이미 완료한 레슨인지 확인
         let existingProgress = try await UserProgress.query(on: db)
@@ -167,7 +179,7 @@ struct CodeExecutionService {
 
         // 이미 완료했으면 XP 중복 지급 안함
         if existingProgress != nil {
-            return 0
+            return ProgressResult(xpEarned: 0, earnedChest: nil)
         }
 
         // 진행 상황 저장/업데이트
@@ -192,7 +204,7 @@ struct CodeExecutionService {
 
         // 사용자 XP 및 Gems 업데이트
         guard let user = try await User.find(userId, on: db) else {
-            return 0
+            return ProgressResult(xpEarned: 0, earnedChest: nil)
         }
 
         let xpEarned = lesson.xpReward
@@ -204,6 +216,56 @@ struct CodeExecutionService {
 
         try await user.save(on: db)
 
-        return xpEarned
+        // Chest 지급 (확률 기반)
+        let earnedChest = try await awardChest(userId: userId, lessonId: lessonId, db: db)
+
+        return ProgressResult(xpEarned: xpEarned, earnedChest: earnedChest)
+    }
+
+    /// 레슨 완료 시 Chest 지급 (확률 기반)
+    private func awardChest(
+        userId: UUID,
+        lessonId: UUID,
+        db: Database
+    ) async throws -> EarnedChestInfo? {
+        // Common: 30%, Rare: 10%, Epic: 3%
+        let roll = Double.random(in: 0...1)
+        let targetRarity: ChestRarity?
+
+        if roll < 0.03 {
+            targetRarity = .epic
+        } else if roll < 0.13 {
+            targetRarity = .rare
+        } else if roll < 0.43 {
+            targetRarity = .common
+        } else {
+            targetRarity = nil
+        }
+
+        guard let rarity = targetRarity else { return nil }
+
+        // 해당 등급의 chest 조회
+        guard let chest = try await Chest.query(on: db)
+            .filter(\.$rarity == rarity)
+            .filter(\.$isActive == true)
+            .first() else {
+            return nil
+        }
+
+        // UserChest 생성
+        let userChest = UserChest(
+            userId: userId,
+            chestId: chest.id!,
+            source: ChestSource.lessonComplete.rawValue,
+            sourceLessonId: lessonId
+        )
+        try await userChest.save(on: db)
+
+        return EarnedChestInfo(
+            id: userChest.id!,
+            name: chest.name,
+            rarity: chest.rarity.rawValue,
+            icon: chest.iconUrl
+        )
     }
 }
