@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api, Lesson, SubmissionResponse, Language } from "@/lib/api";
 import { CodeEditor, OutputViewer } from "@/components/CodeEditor";
+import { LevelUpModal } from "@/components/gamification/LevelUpModal";
+import { useAuthStore } from "@/stores/auth-store";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import confetti from "canvas-confetti";
 
 export default function LessonPage() {
   const params = useParams();
@@ -18,14 +23,77 @@ export default function LessonPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<SubmissionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isShaking, setIsShaking] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "idle">("idle");
+  const resultRef = useRef<SubmissionResponse | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 레슨 데이터 로드
+  // localStorage 키
+  const storageKey = `swiftboot-code-${lessonId}`;
+
+  // 정답 시 Confetti 효과
+  const fireConfetti = useCallback(() => {
+    const duration = 2000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.7 },
+        colors: ["#FFD700", "#34C759", "#007AFF"],
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.7 },
+        colors: ["#FFD700", "#34C759", "#007AFF"],
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
+  }, []);
+
+  // 사용자 정보 및 레벨업 관련
+  const refreshUser = useAuthStore((state) => state.refreshUser);
+  const levelUpInfo = useAuthStore((state) => state.levelUpInfo);
+  const clearLevelUp = useAuthStore((state) => state.clearLevelUp);
+
+  // 결과에 따른 효과 발동
+  useEffect(() => {
+    if (!result || result === resultRef.current) return;
+    resultRef.current = result;
+
+    if (result.status === "success" && result.isCorrect) {
+      fireConfetti();
+      // XP 획득 시 사용자 정보 새로고침
+      refreshUser();
+    } else if (result.status === "failure") {
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+    }
+  }, [result, fireConfetti, refreshUser]);
+
+  // 레슨 데이터 로드 + 저장된 코드 복원
   useEffect(() => {
     async function loadLesson() {
       try {
         const data = await api.getLesson(lessonId);
         setLesson(data);
-        setCode(data.starterCode || "");
+
+        // localStorage에서 저장된 코드 확인
+        const savedCode = localStorage.getItem(storageKey);
+        if (savedCode !== null) {
+          setCode(savedCode);
+          setSaveStatus("saved");
+        } else {
+          setCode(data.starterCode || "");
+        }
       } catch (err) {
         setError("레슨을 불러오는데 실패했습니다.");
         console.error(err);
@@ -34,7 +102,33 @@ export default function LessonPage() {
       }
     }
     loadLesson();
-  }, [lessonId]);
+  }, [lessonId, storageKey]);
+
+  // 코드 변경 시 자동 저장 (debounce 1초)
+  const handleCodeChange = useCallback((newCode: string) => {
+    setCode(newCode);
+    setSaveStatus("saving");
+
+    // 이전 타이머 취소
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // 1초 후 저장
+    saveTimeoutRef.current = setTimeout(() => {
+      localStorage.setItem(storageKey, newCode);
+      setSaveStatus("saved");
+    }, 1000);
+  }, [storageKey]);
+
+  // 컴포넌트 언마운트 시 타이머 정리 및 즉시 저장
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // 코드 제출
   const handleSubmit = useCallback(async () => {
@@ -59,13 +153,15 @@ export default function LessonPage() {
     }
   }, [lesson, lessonId, code, isSubmitting]);
 
-  // 코드 초기화
+  // 코드 초기화 (저장된 코드도 삭제)
   const handleReset = useCallback(() => {
-    if (lesson?.starterCode) {
-      setCode(lesson.starterCode);
+    if (lesson) {
+      setCode(lesson.starterCode || "");
       setResult(null);
+      localStorage.removeItem(storageKey);
+      setSaveStatus("idle");
     }
-  }, [lesson]);
+  }, [lesson, storageKey]);
 
   if (isLoading) {
     return (
@@ -180,8 +276,9 @@ export default function LessonPage() {
                     p: ({ children }) => (
                       <p className="text-[var(--text-secondary)] mb-4 leading-relaxed">{children}</p>
                     ),
-                    code: ({ className, children, ...props }) => {
-                      const isInline = !className;
+                    code: ({ className, children }) => {
+                      const match = /language-(\w+)/.exec(className || "");
+                      const isInline = !match;
                       if (isInline) {
                         return (
                           <code className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] text-[var(--accent-primary)] rounded text-sm font-mono">
@@ -190,15 +287,22 @@ export default function LessonPage() {
                         );
                       }
                       return (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
+                        <SyntaxHighlighter
+                          style={vscDarkPlus}
+                          language={match[1]}
+                          PreTag="div"
+                          customStyle={{
+                            margin: 0,
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {String(children).replace(/\n$/, "")}
+                        </SyntaxHighlighter>
                       );
                     },
                     pre: ({ children }) => (
-                      <pre className="bg-[var(--bg-terminal)] p-4 rounded-lg overflow-x-auto mb-4 text-sm">
-                        {children}
-                      </pre>
+                      <div className="mb-4">{children}</div>
                     ),
                     ul: ({ children }) => (
                       <ul className="list-disc list-inside text-[var(--text-secondary)] mb-4 space-y-1">{children}</ul>
@@ -219,11 +323,31 @@ export default function LessonPage() {
             </div>
 
             {/* 오른쪽: 코드 에디터 */}
-            <div className="space-y-4">
+            <div className={`space-y-4 transition-transform ${isShaking ? "animate-shake" : ""}`}>
+              {/* 에디터 헤더: 저장 상태 표시 */}
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs text-[var(--text-muted)] font-mono">
+                  {lesson.language || "swift"}
+                </span>
+                <span className="text-xs text-[var(--text-muted)] flex items-center gap-1">
+                  {saveStatus === "saving" && (
+                    <>
+                      <div className="w-2 h-2 bg-[var(--accent-warning)] rounded-full animate-pulse" />
+                      저장 중...
+                    </>
+                  )}
+                  {saveStatus === "saved" && (
+                    <>
+                      <div className="w-2 h-2 bg-[var(--success-green)] rounded-full" />
+                      저장됨
+                    </>
+                  )}
+                </span>
+              </div>
               <CodeEditor
                 language={lesson.language || "swift"}
                 value={code}
-                onChange={setCode}
+                onChange={handleCodeChange}
                 height="400px"
               />
 
@@ -237,32 +361,69 @@ export default function LessonPage() {
                   />
 
                   {result.status === "success" && result.isCorrect && (
-                    <div className="flex items-center gap-3 p-4 bg-[var(--success-green)]/10 border border-[var(--success-green)] rounded-lg">
-                      <div className="w-10 h-10 bg-[var(--success-green)] rounded-full flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="space-y-3 animate-slideUp">
+                      <div className="flex items-center gap-3 p-4 bg-[var(--success-green)]/10 border border-[var(--success-green)] rounded-lg">
+                        <div className="w-12 h-12 bg-[var(--success-green)] rounded-full flex items-center justify-center animate-bounce">
+                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-bold text-lg text-[var(--success-green)]">정답입니다!</p>
+                          <p className="text-sm text-[var(--text-secondary)]">
+                            +{result.xpEarned || lesson.xpReward} XP 획득
+                          </p>
+                        </div>
+                        <div className="text-3xl animate-float">🎉</div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-[var(--success-green)]">정답입니다!</p>
-                        <p className="text-sm text-[var(--text-secondary)]">
-                          +{result.xpEarned || lesson.xpReward} XP 획득
-                        </p>
+
+                      {/* 다음 레슨 버튼 */}
+                      <div className="flex gap-2">
+                        {lesson.previousLessonId && (
+                          <button
+                            onClick={() => router.push(`/learn/${lesson.previousLessonId}`)}
+                            className="flex-1 py-3 px-4 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors flex items-center justify-center gap-2"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            이전 레슨
+                          </button>
+                        )}
+                        {lesson.nextLessonId ? (
+                          <button
+                            onClick={() => router.push(`/learn/${lesson.nextLessonId}`)}
+                            className="flex-1 py-3 px-4 bg-[var(--accent-primary)] text-white font-medium rounded-lg hover:bg-[var(--accent-primary-hover)] transition-colors flex items-center justify-center gap-2"
+                          >
+                            다음 레슨
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => router.push(`/courses/${lesson.courseId}`)}
+                            className="flex-1 py-3 px-4 bg-[var(--xp-gold)] text-[var(--text-inverse)] font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                          >
+                            🎊 코스 완료!
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
 
                   {result.status === "failure" && (
-                    <div className="flex items-center gap-3 p-4 bg-[var(--error-red)]/10 border border-[var(--error-red)] rounded-lg">
+                    <div className="flex items-center gap-3 p-4 bg-[var(--error-red)]/10 border border-[var(--error-red)] rounded-lg animate-slideUp">
                       <div className="w-10 h-10 bg-[var(--error-red)] rounded-full flex items-center justify-center">
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="font-semibold text-[var(--error-red)]">다시 시도해보세요</p>
                         <p className="text-sm text-[var(--text-secondary)]">{result.message}</p>
                       </div>
+                      <div className="text-2xl">💪</div>
                     </div>
                   )}
                 </div>
@@ -286,8 +447,9 @@ export default function LessonPage() {
                     p: ({ children }) => (
                       <p className="text-[var(--text-secondary)] mb-4 leading-relaxed">{children}</p>
                     ),
-                    code: ({ className, children, ...props }) => {
-                      const isInline = !className;
+                    code: ({ className, children }) => {
+                      const match = /language-(\w+)/.exec(className || "");
+                      const isInline = !match;
                       if (isInline) {
                         return (
                           <code className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] text-[var(--accent-primary)] rounded text-sm font-mono">
@@ -296,15 +458,22 @@ export default function LessonPage() {
                         );
                       }
                       return (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
+                        <SyntaxHighlighter
+                          style={vscDarkPlus}
+                          language={match[1]}
+                          PreTag="div"
+                          customStyle={{
+                            margin: 0,
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {String(children).replace(/\n$/, "")}
+                        </SyntaxHighlighter>
                       );
                     },
                     pre: ({ children }) => (
-                      <pre className="bg-[var(--bg-terminal)] p-4 rounded-lg overflow-x-auto mb-4 text-sm">
-                        {children}
-                      </pre>
+                      <div className="mb-4">{children}</div>
                     ),
                     ul: ({ children }) => (
                       <ul className="list-disc list-inside text-[var(--text-secondary)] mb-4 space-y-1">{children}</ul>
@@ -336,6 +505,13 @@ export default function LessonPage() {
           </div>
         )}
       </main>
+
+      {/* 레벨업 모달 */}
+      <LevelUpModal
+        isOpen={!!levelUpInfo}
+        newLevel={levelUpInfo?.newLevel ?? 0}
+        onClose={clearLevelUp}
+      />
     </div>
   );
 }
