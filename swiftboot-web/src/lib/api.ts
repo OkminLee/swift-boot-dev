@@ -68,6 +68,10 @@ export interface Lesson {
   language: Language | null;
   starterCode: string | null;
   xpReward: number;
+  courseId: string;
+  chapterId: string;
+  previousLessonId: string | null;
+  nextLessonId: string | null;
 }
 
 export interface SubmissionResponse {

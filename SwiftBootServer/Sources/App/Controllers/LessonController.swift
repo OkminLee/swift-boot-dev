@@ -22,13 +22,57 @@ struct LessonController: RouteCollection {
             throw Abort(.badRequest)
         }
 
+        // 레슨과 챕터 정보 함께 로드
         guard let lesson = try await Lesson.query(on: req.db)
             .filter(\.$id == lessonId)
+            .with(\.$chapter) { chapter in
+                chapter.with(\.$course)
+            }
             .first() else {
             throw Abort(.notFound)
         }
 
-        return LessonDetailResponse(from: lesson)
+        let chapter = lesson.chapter
+        let courseId = chapter.$course.id
+
+        // 같은 코스의 모든 챕터와 레슨 조회 (순서대로)
+        let allChapters = try await Chapter.query(on: req.db)
+            .filter(\.$course.$id == courseId)
+            .with(\.$lessons)
+            .sort(\.$order)
+            .all()
+
+        // 모든 레슨을 순서대로 평탄화
+        var allLessons: [(chapterId: UUID, lessonId: UUID, order: Int, chapterOrder: Int)] = []
+        for ch in allChapters {
+            let sortedLessons = ch.lessons.sorted { $0.order < $1.order }
+            for l in sortedLessons {
+                allLessons.append((ch.id!, l.id!, l.order, ch.order))
+            }
+        }
+
+        // 현재 레슨 인덱스 찾기
+        let currentIndex = allLessons.firstIndex { $0.lessonId == lessonId }
+
+        var previousLessonId: UUID? = nil
+        var nextLessonId: UUID? = nil
+
+        if let idx = currentIndex {
+            if idx > 0 {
+                previousLessonId = allLessons[idx - 1].lessonId
+            }
+            if idx < allLessons.count - 1 {
+                nextLessonId = allLessons[idx + 1].lessonId
+            }
+        }
+
+        return LessonDetailResponse(
+            from: lesson,
+            courseId: courseId,
+            chapterId: chapter.id!,
+            previousLessonId: previousLessonId,
+            nextLessonId: nextLessonId
+        )
     }
 
     /// 코드 제출
@@ -75,8 +119,18 @@ struct LessonDetailResponse: Content {
     let language: ProgrammingLanguage?
     let starterCode: String?
     let xpReward: Int
+    let courseId: UUID
+    let chapterId: UUID
+    let previousLessonId: UUID?
+    let nextLessonId: UUID?
 
-    init(from lesson: Lesson) {
+    init(
+        from lesson: Lesson,
+        courseId: UUID,
+        chapterId: UUID,
+        previousLessonId: UUID?,
+        nextLessonId: UUID?
+    ) {
         self.id = lesson.id!
         self.title = lesson.title
         self.content = lesson.content
@@ -84,6 +138,10 @@ struct LessonDetailResponse: Content {
         self.language = lesson.language
         self.starterCode = lesson.starterCode
         self.xpReward = lesson.xpReward
+        self.courseId = courseId
+        self.chapterId = chapterId
+        self.previousLessonId = previousLessonId
+        self.nextLessonId = nextLessonId
     }
 }
 
