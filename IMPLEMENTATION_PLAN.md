@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 2.0
+**문서 버전:** 2.1
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -68,11 +68,13 @@
   - 인벤토리 페이지: 보유 아이템 표시
   - 레슨 페이지: Seer Stone으로 정답 보기 기능
   - 첫 레슨 완료 시 5💎 Gems 지급
-- ✅ **Chest 개봉 모달 MVP**
-  - ChestOpenModal 컴포넌트 (Common/Rare/Legendary 등급)
-  - 3단계 애니메이션: 흔들림 → 열기 → 보상 표시
-  - 등급별 Confetti 효과 (canvas-confetti)
-  - 인벤토리 페이지 데모 연동
+- ✅ **Chest 시스템 완성** (백엔드 + 프론트엔드)
+  - Chest, UserChest 모델 및 마이그레이션
+  - ChestController: 목록 조회, 개봉 API (보상 지급)
+  - 등급별 보상 범위 (Common/Rare/Epic/Legendary)
+  - 레슨 완료 시 확률 기반 Chest 획득 (Common 30%, Rare 10%, Epic 3%)
+  - ChestOpenModal: 4단계 등급, API 보상 연동
+  - 레슨 정답 시 자동 Chest 개봉 모달 표시
 - ✅ **"Swifty 만들기" 코스 (10개 레슨)**
   - 스토리 기반 Swift 기초 학습 (AI 챗봇 개발 컨셉)
   - Chapter 1: Swifty 깨우기 (print, 변수, 연산자)
@@ -91,8 +93,8 @@
 ### 다음 우선순위 작업
 
 1. 🔜 XP Potion, 코스메틱 아이템 추가
-3. 🔜 Chest 백엔드 API (보상 로직)
-4. 🔜 추가 코스 콘텐츠 (Course 2: SwiftPay 개발기)
+2. 🔜 추가 코스 콘텐츠 (Course 2: SwiftPay 개발기)
+3. 🔜 인벤토리 페이지: 미개봉 Chest 표시 및 개봉 UI
 
 ---
 
@@ -757,6 +759,7 @@ jobs:
 | 1.8 | 2025-12-30 | Chest 개봉 모달 MVP: ChestOpenModal 컴포넌트, 등급별 애니메이션 (chestShake/chestOpen/rewardPop), 인벤토리 페이지 데모 연동 |
 | 1.9 | 2025-12-30 | "Swifty 만들기" 코스 완성: 스토리 기반 Swift 기초 10개 레슨 (310 XP), Phase 2B 시작 |
 | 2.0 | 2025-12-30 | **Phase 2A 완료**: 사운드 효과 시스템 구현 (Web Audio API), 정답/오답/레벨업 사운드, 사운드 on/off 토글 |
+| 2.1 | 2025-12-30 | **Chest 시스템 완성**: 백엔드 API (Chest/UserChest 모델, ChestController), 레슨 완료 시 확률 기반 Chest 획득, 자동 개봉 모달 |
 
 ---
 
