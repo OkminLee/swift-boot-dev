@@ -1,7 +1,7 @@
 import Vapor
 
 func routes(_ app: Application) throws {
-    // Health check
+    // Health check (Rate Limit 제외)
     app.get { _ async in
         ["status": "ok", "service": "SwiftBoot API"]
     }
@@ -10,11 +10,14 @@ func routes(_ app: Application) throws {
         ["status": "healthy"]
     }
 
-    // API v1 routes
+    // API v1 routes - 기본 Rate Limit 적용
     let api = app.grouped("api", "v1")
+        .grouped(RateLimitMiddleware(config: .default))
 
-    // Auth routes
-    try api.register(collection: AuthController())
+    // Auth routes - 더 엄격한 Rate Limit
+    let authApi = app.grouped("api", "v1")
+        .grouped(RateLimitMiddleware(config: .auth))
+    try authApi.register(collection: AuthController())
 
     // User routes
     try api.register(collection: UserController())

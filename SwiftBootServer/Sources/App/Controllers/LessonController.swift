@@ -8,8 +8,10 @@ struct LessonController: RouteCollection {
         // 레슨 조회는 인증 불필요
         lessons.get(":lessonId", use: getLesson)
 
-        // 코드 제출은 인증 필요
-        let protected = lessons.grouped(JWTAuthMiddleware())
+        // 코드 제출은 인증 + 엄격한 Rate Limit 적용
+        let protected = lessons
+            .grouped(JWTAuthMiddleware())
+            .grouped(RateLimitMiddleware(config: .codeExecution))
         protected.post(":lessonId", "submit", use: submitLesson)
     }
 
