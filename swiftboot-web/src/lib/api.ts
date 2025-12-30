@@ -81,6 +81,7 @@ export interface SubmissionResponse {
   output?: string;
   isCorrect?: boolean;
   xpEarned?: number;
+  earnedChest?: EarnedChestInfo;
 }
 
 // Progress types
@@ -140,6 +141,45 @@ export interface SeerStoneResponse {
   message: string;
   solutionCode: string | null;
   remainingQuantity: number;
+}
+
+// Chest types
+export type ChestRarity = "common" | "rare" | "epic" | "legendary";
+
+export interface EarnedChestInfo {
+  id: string;
+  name: string;
+  rarity: ChestRarity;
+  icon: string;
+}
+
+export interface UserChest {
+  id: string;
+  chestId: string;
+  chestName: string;
+  chestRarity: ChestRarity;
+  chestIcon: string;
+  source: string;
+  isOpened: boolean;
+  acquiredAt: string | null;
+  openedAt: string | null;
+}
+
+export interface ChestReward {
+  gems: number;
+  xp: number;
+  items: { itemId: string; itemName: string; quantity: number }[];
+}
+
+export interface ChestOpenResponse {
+  userChestId: string;
+  chestRarity: ChestRarity;
+  chestName: string;
+  reward: ChestReward;
+  didLevelUp: boolean;
+  newLevel: number;
+  newTotalXp: number;
+  newGems: number;
 }
 
 class ApiClient {
@@ -338,6 +378,25 @@ class ApiClient {
     return this.request<SeerStoneResponse>(`/inventory/use/seer-stone/${lessonId}`, {
       method: "POST",
     });
+  }
+
+  // Chests
+  async getMyChests(): Promise<UserChest[]> {
+    return this.request<UserChest[]>("/chests");
+  }
+
+  async getUnopenedChests(): Promise<UserChest[]> {
+    return this.request<UserChest[]>("/chests/unopened");
+  }
+
+  async openChest(userChestId: string): Promise<ChestOpenResponse> {
+    return this.request<ChestOpenResponse>(`/chests/${userChestId}/open`, {
+      method: "POST",
+    });
+  }
+
+  async getChestHistory(): Promise<UserChest[]> {
+    return this.request<UserChest[]>("/chests/history");
   }
 }
 

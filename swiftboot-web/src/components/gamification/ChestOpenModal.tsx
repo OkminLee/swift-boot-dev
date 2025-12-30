@@ -2,10 +2,11 @@
 
 import { useEffect, useCallback, useState } from "react";
 import confetti from "canvas-confetti";
+import { ChestRarity as ApiChestRarity, ChestReward as ApiChestReward } from "@/lib/api";
 
-export type ChestRarity = "common" | "rare" | "legendary";
+export type ChestRarity = ApiChestRarity;
 
-interface ChestReward {
+interface ChestRewardDisplay {
   type: "gems" | "xp" | "item";
   amount?: number;
   itemName?: string;
@@ -15,7 +16,8 @@ interface ChestReward {
 interface ChestOpenModalProps {
   isOpen: boolean;
   rarity: ChestRarity;
-  rewards?: ChestReward[];
+  rewards?: ChestRewardDisplay[];
+  apiReward?: ApiChestReward;
   onClose: () => void;
 }
 
@@ -39,10 +41,17 @@ const CHEST_CONFIG: Record<
   },
   rare: {
     name: "희귀 상자",
-    icon: "💎",
+    icon: "🎁",
     colors: ["#3B82F6", "#60A5FA", "#2563EB", "#93C5FD"],
     cssVar: "var(--chest-rare)",
     glowColor: "rgba(59, 130, 246, 0.4)",
+  },
+  epic: {
+    name: "에픽 상자",
+    icon: "💎",
+    colors: ["#8B5CF6", "#A78BFA", "#7C3AED", "#C4B5FD"],
+    cssVar: "var(--chest-epic)",
+    glowColor: "rgba(139, 92, 246, 0.5)",
   },
   legendary: {
     name: "전설 상자",
@@ -54,21 +63,24 @@ const CHEST_CONFIG: Record<
 };
 
 // 기본 보상 (MVP용 하드코딩)
-const DEFAULT_REWARDS: Record<ChestRarity, ChestReward[]> = {
+const DEFAULT_REWARDS: Record<ChestRarity, ChestRewardDisplay[]> = {
   common: [
-    { type: "gems", amount: 15, icon: "💎" },
-    { type: "xp", amount: 50, icon: "⭐" },
+    { type: "gems", amount: 3, icon: "💎" },
+    { type: "xp", amount: 20, icon: "⭐" },
   ],
   rare: [
-    { type: "gems", amount: 50, icon: "💎" },
-    { type: "xp", amount: 150, icon: "⭐" },
+    { type: "gems", amount: 10, icon: "💎" },
+    { type: "xp", amount: 45, icon: "⭐" },
+  ],
+  epic: [
+    { type: "gems", amount: 22, icon: "💎" },
+    { type: "xp", amount: 90, icon: "⭐" },
     { type: "item", itemName: "Seer Stone", icon: "🔮" },
   ],
   legendary: [
-    { type: "gems", amount: 200, icon: "💎" },
-    { type: "xp", amount: 500, icon: "⭐" },
-    { type: "item", itemName: "Seer Stone x3", icon: "🔮" },
-    { type: "item", itemName: "XP Potion", icon: "🧪" },
+    { type: "gems", amount: 65, icon: "💎" },
+    { type: "xp", amount: 210, icon: "⭐" },
+    { type: "item", itemName: "Seer Stone x2", icon: "🔮" },
   ],
 };
 
@@ -76,30 +88,54 @@ export function ChestOpenModal({
   isOpen,
   rarity,
   rewards,
+  apiReward,
   onClose,
 }: ChestOpenModalProps) {
   const [phase, setPhase] = useState<"closed" | "opening" | "opened">("closed");
   const [showRewards, setShowRewards] = useState(false);
 
   const config = CHEST_CONFIG[rarity];
-  const actualRewards = rewards || DEFAULT_REWARDS[rarity];
+
+  // API 보상을 표시 형식으로 변환
+  const convertApiReward = (reward: ApiChestReward): ChestRewardDisplay[] => {
+    const result: ChestRewardDisplay[] = [];
+    if (reward.gems > 0) {
+      result.push({ type: "gems", amount: reward.gems, icon: "💎" });
+    }
+    if (reward.xp > 0) {
+      result.push({ type: "xp", amount: reward.xp, icon: "⭐" });
+    }
+    for (const item of reward.items) {
+      result.push({
+        type: "item",
+        itemName: item.quantity > 1 ? `${item.itemName} x${item.quantity}` : item.itemName,
+        icon: "🔮",
+      });
+    }
+    return result;
+  };
+
+  const actualRewards = apiReward
+    ? convertApiReward(apiReward)
+    : rewards || DEFAULT_REWARDS[rarity];
 
   // Confetti 효과
   const fireChestConfetti = useCallback(() => {
-    const config = CHEST_CONFIG[rarity];
-    const duration = rarity === "legendary" ? 4000 : rarity === "rare" ? 3000 : 2000;
+    const chestConfig = CHEST_CONFIG[rarity];
+    const isHighTier = rarity === "legendary" || rarity === "epic";
+    const duration = rarity === "legendary" ? 4000 : rarity === "epic" ? 3500 : rarity === "rare" ? 3000 : 2000;
     const end = Date.now() + duration;
 
     // 중앙 폭발
     confetti({
-      particleCount: rarity === "legendary" ? 150 : rarity === "rare" ? 100 : 60,
-      spread: rarity === "legendary" ? 120 : 90,
+      particleCount: rarity === "legendary" ? 150 : rarity === "epic" ? 120 : rarity === "rare" ? 100 : 60,
+      spread: isHighTier ? 120 : 90,
       origin: { x: 0.5, y: 0.5 },
-      colors: config.colors,
-      startVelocity: rarity === "legendary" ? 45 : 30,
+      colors: chestConfig.colors,
+      startVelocity: isHighTier ? 45 : 30,
     });
 
-    // 연속 폭발 (rare, legendary만)
+    // 연속 폭발 (rare 이상)
     if (rarity !== "common") {
       const frame = () => {
         confetti({
@@ -107,14 +143,14 @@ export function ChestOpenModal({
           angle: 60,
           spread: 60,
           origin: { x: 0, y: 0.7 },
-          colors: config.colors,
+          colors: chestConfig.colors,
         });
         confetti({
           particleCount: 3,
           angle: 120,
           spread: 60,
           origin: { x: 1, y: 0.7 },
-          colors: config.colors,
+          colors: chestConfig.colors,
         });
 
         if (Date.now() < end) {
@@ -124,14 +160,14 @@ export function ChestOpenModal({
       frame();
     }
 
-    // Legendary 추가 효과
-    if (rarity === "legendary") {
+    // Legendary/Epic 추가 효과
+    if (isHighTier) {
       setTimeout(() => {
         confetti({
           particleCount: 50,
           spread: 360,
           origin: { x: 0.5, y: 0.5 },
-          colors: ["#FFD700", "#FFA500"],
+          colors: rarity === "legendary" ? ["#FFD700", "#FFA500"] : ["#8B5CF6", "#A78BFA"],
           startVelocity: 35,
           gravity: 0.5,
           shapes: ["star"],
