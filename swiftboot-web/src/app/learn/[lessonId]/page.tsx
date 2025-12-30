@@ -8,8 +8,7 @@ import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 import { ChestOpenModal } from "@/components/gamification/ChestOpenModal";
 import { useAuthStore } from "@/stores/auth-store";
 import { playSuccess, playError } from "@/lib/sounds";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { MdxRenderer } from "@/components/mdx/MdxRenderer";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import confetti from "canvas-confetti";
@@ -359,63 +358,7 @@ export default function LessonPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 왼쪽: 설명 */}
             <div className="bg-[var(--bg-secondary)] rounded-xl p-6 border border-[var(--border-default)]">
-              <div className="prose prose-invert max-w-none">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    h1: ({ children }) => (
-                      <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-4">{children}</h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className="text-xl font-semibold text-[var(--text-primary)] mt-6 mb-3">{children}</h2>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-[var(--text-secondary)] mb-4 leading-relaxed">{children}</p>
-                    ),
-                    code: ({ className, children }) => {
-                      const match = /language-(\w+)/.exec(className || "");
-                      const isInline = !match;
-                      if (isInline) {
-                        return (
-                          <code className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] text-[var(--accent-primary)] rounded text-sm font-mono">
-                            {children}
-                          </code>
-                        );
-                      }
-                      return (
-                        <SyntaxHighlighter
-                          style={vscDarkPlus}
-                          language={match[1]}
-                          PreTag="div"
-                          customStyle={{
-                            margin: 0,
-                            borderRadius: "8px",
-                            fontSize: "14px",
-                          }}
-                        >
-                          {String(children).replace(/\n$/, "")}
-                        </SyntaxHighlighter>
-                      );
-                    },
-                    pre: ({ children }) => (
-                      <div className="mb-4">{children}</div>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="list-disc list-inside text-[var(--text-secondary)] mb-4 space-y-1">{children}</ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal list-inside text-[var(--text-secondary)] mb-4 space-y-1">{children}</ol>
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-[var(--accent-primary)] pl-4 italic text-[var(--text-secondary)] my-4">
-                        {children}
-                      </blockquote>
-                    ),
-                  }}
-                >
-                  {lesson.content}
-                </ReactMarkdown>
-              </div>
+              <MdxRenderer content={lesson.content} />
             </div>
 
             {/* 오른쪽: 코드 에디터 */}
@@ -567,63 +510,7 @@ export default function LessonPage() {
           // 읽기 레슨: 단일 컬럼 레이아웃
           <div className="max-w-3xl mx-auto">
             <div className="bg-[var(--bg-secondary)] rounded-xl p-8 border border-[var(--border-default)]">
-              <div className="prose prose-invert max-w-none">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    h1: ({ children }) => (
-                      <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-4">{children}</h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className="text-xl font-semibold text-[var(--text-primary)] mt-6 mb-3">{children}</h2>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-[var(--text-secondary)] mb-4 leading-relaxed">{children}</p>
-                    ),
-                    code: ({ className, children }) => {
-                      const match = /language-(\w+)/.exec(className || "");
-                      const isInline = !match;
-                      if (isInline) {
-                        return (
-                          <code className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] text-[var(--accent-primary)] rounded text-sm font-mono">
-                            {children}
-                          </code>
-                        );
-                      }
-                      return (
-                        <SyntaxHighlighter
-                          style={vscDarkPlus}
-                          language={match[1]}
-                          PreTag="div"
-                          customStyle={{
-                            margin: 0,
-                            borderRadius: "8px",
-                            fontSize: "14px",
-                          }}
-                        >
-                          {String(children).replace(/\n$/, "")}
-                        </SyntaxHighlighter>
-                      );
-                    },
-                    pre: ({ children }) => (
-                      <div className="mb-4">{children}</div>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="list-disc list-inside text-[var(--text-secondary)] mb-4 space-y-1">{children}</ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal list-inside text-[var(--text-secondary)] mb-4 space-y-1">{children}</ol>
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-[var(--accent-primary)] pl-4 italic text-[var(--text-secondary)] my-4">
-                        {children}
-                      </blockquote>
-                    ),
-                  }}
-                >
-                  {lesson.content}
-                </ReactMarkdown>
-              </div>
+              <MdxRenderer content={lesson.content} />
 
               {/* 완료 버튼 */}
               <div className="mt-8 pt-6 border-t border-[var(--border-default)]">
