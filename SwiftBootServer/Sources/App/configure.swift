@@ -57,6 +57,9 @@ func configure(_ app: Application) async throws {
     app.migrations.add(CreateUserProgress())
     app.migrations.add(CreateRefreshToken())
     app.migrations.add(SeedContent())
+    app.migrations.add(CreateShopItem())
+    app.migrations.add(CreateUserInventory())
+    app.migrations.add(SeedShopItems())
 
     // MARK: - Routes
     try routes(app)
