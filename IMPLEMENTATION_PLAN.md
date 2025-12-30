@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 1.9
+**문서 버전:** 2.0
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -16,7 +16,7 @@
 | **Phase 1A** | 백엔드 MVP | ✅ 완료 | 100% |
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
 | **Phase 1C** | 웹 클라이언트 MVP | ✅ 완료 | 100% |
-| **Phase 2A** | 게이미피케이션 | 🟡 진행중 | 80% |
+| **Phase 2A** | 게이미피케이션 | ✅ 완료 | 100% |
 | **Phase 2B** | 콘텐츠 & 폴리싱 | 🟡 진행중 | 20% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
 
@@ -80,11 +80,17 @@
   - Chapter 3: Swifty의 기억 저장소 (Array, Dictionary)
   - Chapter 4: Swifty 고급 기능 (for-in, 함수)
   - 총 310 XP, 모든 레슨 실습 중심
+- ✅ **사운드 효과 시스템**
+  - Web Audio API 기반 프로그래매틱 사운드 (sounds.ts)
+  - 정답 시 성공 사운드 (상승 멜로디 C5→E5→G5)
+  - 오답 시 실패 사운드 (하강 톤)
+  - 레벨업 시 팡파레 (C5→E5→G5→C6 + 글리터)
+  - 사운드 on/off 토글 (사이드바, localStorage 저장)
+  - sound-store.ts: Zustand 상태 관리
 
 ### 다음 우선순위 작업
 
-1. 🔜 사운드 효과 (정답/오답/레벨업)
-2. 🔜 XP Potion, 코스메틱 아이템 추가
+1. 🔜 XP Potion, 코스메틱 아이템 추가
 3. 🔜 Chest 백엔드 API (보상 로직)
 4. 🔜 추가 코스 콘텐츠 (Course 2: SwiftPay 개발기)
 
@@ -554,15 +560,15 @@ Level 10→11: ~3,162 XP
 
 - [x] 정답 피드백
   - [x] Confetti 효과 (canvas-confetti) *(lesson page에 구현)*
-  - [ ] 성공 사운드
+  - [x] 성공 사운드 *(Web Audio API - 상승 멜로디)*
   - [x] XP 획득 애니메이션 *(slideUp 애니메이션)*
 - [x] 오답 피드백
   - [x] 화면 흔들림 (CSS animation) *(shake 애니메이션)*
-  - [ ] 실패 사운드
+  - [x] 실패 사운드 *(Web Audio API - 하강 톤)*
 - [x] 레벨업 피드백
   - [x] 전체 화면 골든 오버레이 *(LevelUpModal)*
-  - [ ] 팡파레 사운드
-- [ ] 사운드 on/off 설정
+  - [x] 팡파레 사운드 *(Web Audio API - 옥타브 상승 + 글리터)*
+- [x] 사운드 on/off 설정 *(사이드바 토글, localStorage 저장)*
 
 **산출물:**
 - 완전한 게이미피케이션 시스템
@@ -750,6 +756,7 @@ jobs:
 | 1.7 | 2025-12-30 | 상점/인벤토리 시스템 MVP 완료: ShopItem/UserInventory 모델, 상점/인벤토리 페이지, Seer Stone 정답 보기, 첫 레슨 완료 시 Gems 지급 |
 | 1.8 | 2025-12-30 | Chest 개봉 모달 MVP: ChestOpenModal 컴포넌트, 등급별 애니메이션 (chestShake/chestOpen/rewardPop), 인벤토리 페이지 데모 연동 |
 | 1.9 | 2025-12-30 | "Swifty 만들기" 코스 완성: 스토리 기반 Swift 기초 10개 레슨 (310 XP), Phase 2B 시작 |
+| 2.0 | 2025-12-30 | **Phase 2A 완료**: 사운드 효과 시스템 구현 (Web Audio API), 정답/오답/레벨업 사운드, 사운드 on/off 토글 |
 
 ---
 
