@@ -58,6 +58,7 @@ func configure(_ app: Application) async throws {
     app.migrations.add(CreateRefreshToken())
     app.migrations.add(SeedContent())
     app.migrations.add(SeedSwiftyContent())
+    app.migrations.add(SeedSwifty2Content())
     app.migrations.add(CreateShopItem())
     app.migrations.add(CreateUserInventory())
     app.migrations.add(SeedShopItems())
