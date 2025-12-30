@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { api, CourseDetail, Chapter, LessonSummary } from "@/lib/api";
+import { api, CourseDetail, Chapter, LessonSummary, ProgressResponse } from "@/lib/api";
 
 const lessonTypeIcons: Record<string, { icon: string; label: string }> = {
   reading: { icon: "📖", label: "읽기" },
@@ -39,15 +39,29 @@ export default function CourseDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
+  const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function loadCourse() {
       try {
-        const data = await api.getCourse(courseId);
-        setCourse(data);
+        const [courseData, progressData] = await Promise.all([
+          api.getCourse(courseId),
+          api.getUserProgress().catch(() => [] as ProgressResponse[]),
+        ]);
+
+        setCourse(courseData);
+
+        // 완료된 레슨 ID 추출
+        const completed = new Set(
+          progressData
+            .filter((p) => p.status === "completed")
+            .map((p) => p.lessonId)
+        );
+        setCompletedLessonIds(completed);
+
         // 첫 번째 챕터 자동 펼침
-        if (data.chapters.length > 0) {
-          setExpandedChapters(new Set([data.chapters[0].id]));
+        if (courseData.chapters.length > 0) {
+          setExpandedChapters(new Set([courseData.chapters[0].id]));
         }
       } catch (err) {
         console.error("Failed to load course:", err);
@@ -81,6 +95,14 @@ export default function CourseDetailPage() {
     if (!course) return 0;
     return course.chapters.reduce(
       (acc, ch) => acc + ch.lessons.reduce((a, l) => a + l.xpReward, 0),
+      0
+    );
+  };
+
+  const getCompletedLessons = () => {
+    if (!course) return 0;
+    return course.chapters.reduce(
+      (acc, ch) => acc + ch.lessons.filter((l) => completedLessonIds.has(l.id)).length,
       0
     );
   };
@@ -184,6 +206,24 @@ export default function CourseDetailPage() {
                   </span>
                 </div>
               </div>
+
+              {/* Progress Bar */}
+              {getCompletedLessons() > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-[var(--text-secondary)]">진행률</span>
+                    <span className="text-[var(--accent-success)]">
+                      {getCompletedLessons()}/{getTotalLessons()} 완료
+                    </span>
+                  </div>
+                  <div className="h-2 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[var(--accent-success)] rounded-full transition-all duration-300"
+                      style={{ width: `${(getCompletedLessons() / getTotalLessons()) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -215,6 +255,7 @@ export default function CourseDetailPage() {
               index={index + 1}
               isExpanded={expandedChapters.has(chapter.id)}
               onToggle={() => toggleChapter(chapter.id)}
+              completedLessonIds={completedLessonIds}
             />
           ))}
         </div>
@@ -228,10 +269,13 @@ interface ChapterAccordionProps {
   index: number;
   isExpanded: boolean;
   onToggle: () => void;
+  completedLessonIds: Set<string>;
 }
 
-function ChapterAccordion({ chapter, index, isExpanded, onToggle }: ChapterAccordionProps) {
+function ChapterAccordion({ chapter, index, isExpanded, onToggle, completedLessonIds }: ChapterAccordionProps) {
   const totalXp = chapter.lessons.reduce((acc, l) => acc + l.xpReward, 0);
+  const completedCount = chapter.lessons.filter((l) => completedLessonIds.has(l.id)).length;
+  const isChapterCompleted = completedCount === chapter.lessons.length && chapter.lessons.length > 0;
 
   return (
     <div className="bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-xl overflow-hidden">
@@ -241,8 +285,12 @@ function ChapterAccordion({ chapter, index, isExpanded, onToggle }: ChapterAccor
         className="w-full flex items-center justify-between p-4 hover:bg-[var(--bg-hover)] transition-colors"
       >
         <div className="flex items-center gap-4">
-          <div className="w-8 h-8 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-lg flex items-center justify-center font-bold text-sm">
-            {index}
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${
+            isChapterCompleted
+              ? "bg-[var(--accent-success)]/10 text-[var(--accent-success)]"
+              : "bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]"
+          }`}>
+            {isChapterCompleted ? "✓" : index}
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-[var(--text-primary)]">{chapter.title}</h3>
@@ -253,7 +301,13 @@ function ChapterAccordion({ chapter, index, isExpanded, onToggle }: ChapterAccor
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-[var(--text-muted)]">
-            {chapter.lessons.length}개 레슨 · {totalXp} XP
+            {completedCount > 0 && (
+              <span className="text-[var(--accent-success)] mr-2">
+                {completedCount}/{chapter.lessons.length}
+              </span>
+            )}
+            {completedCount === 0 && `${chapter.lessons.length}개 레슨 · `}
+            {totalXp} XP
           </span>
           <svg
             className={`w-5 h-5 text-[var(--text-muted)] transition-transform ${isExpanded ? "rotate-180" : ""}`}
@@ -270,7 +324,12 @@ function ChapterAccordion({ chapter, index, isExpanded, onToggle }: ChapterAccor
       {isExpanded && (
         <div className="border-t border-[var(--border-default)]">
           {chapter.lessons.map((lesson, lessonIndex) => (
-            <LessonRow key={lesson.id} lesson={lesson} index={lessonIndex + 1} />
+            <LessonRow
+              key={lesson.id}
+              lesson={lesson}
+              index={lessonIndex + 1}
+              isCompleted={completedLessonIds.has(lesson.id)}
+            />
           ))}
         </div>
       )}
@@ -281,27 +340,40 @@ function ChapterAccordion({ chapter, index, isExpanded, onToggle }: ChapterAccor
 interface LessonRowProps {
   lesson: LessonSummary;
   index: number;
+  isCompleted: boolean;
 }
 
-function LessonRow({ lesson, index }: LessonRowProps) {
+function LessonRow({ lesson, index, isCompleted }: LessonRowProps) {
   const type = lessonTypeIcons[lesson.type] || lessonTypeIcons.reading;
 
   return (
     <Link
       href={`/learn/${lesson.id}`}
-      className="flex items-center justify-between px-4 py-3 hover:bg-[var(--bg-hover)] transition-colors border-b border-[var(--border-default)] last:border-b-0"
+      className={`flex items-center justify-between px-4 py-3 hover:bg-[var(--bg-hover)] transition-colors border-b border-[var(--border-default)] last:border-b-0 ${
+        isCompleted ? "bg-[var(--accent-success)]/5" : ""
+      }`}
     >
       <div className="flex items-center gap-4">
-        <div className="w-6 h-6 flex items-center justify-center text-[var(--text-muted)]">
-          {index}
+        <div className={`w-6 h-6 flex items-center justify-center rounded-full text-sm ${
+          isCompleted
+            ? "bg-[var(--accent-success)] text-white"
+            : "text-[var(--text-muted)]"
+        }`}>
+          {isCompleted ? "✓" : index}
         </div>
         <span className="text-lg" title={type.label}>
           {type.icon}
         </span>
-        <span className="text-[var(--text-primary)]">{lesson.title}</span>
+        <span className={`${isCompleted ? "text-[var(--text-secondary)]" : "text-[var(--text-primary)]"}`}>
+          {lesson.title}
+        </span>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-sm text-[var(--xp-gold)]">+{lesson.xpReward} XP</span>
+        {isCompleted ? (
+          <span className="text-sm text-[var(--accent-success)]">완료</span>
+        ) : (
+          <span className="text-sm text-[var(--xp-gold)]">+{lesson.xpReward} XP</span>
+        )}
         <svg
           className="w-4 h-4 text-[var(--text-muted)]"
           fill="none"

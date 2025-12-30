@@ -11,7 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, stats, isAuthenticated, isLoading, logout } = useAuth();
 
   // 인증되지 않은 경우 로그인 페이지로 리다이렉트
   useEffect(() => {
@@ -39,8 +39,8 @@ export default function DashboardLayout({
     return null;
   }
 
-  const xpProgress = user ? (user.totalXp / (100 * Math.pow(user.level, 1.5))) * 100 : 0;
-  const xpRequired = user ? Math.floor(100 * Math.pow(user.level, 1.5)) : 100;
+  const xpProgress = stats ? stats.levelProgress * 100 : 0;
+  const xpToNextLevel = stats?.xpToNextLevel ?? 100;
 
   return (
     <div className="min-h-screen flex">
@@ -101,8 +101,8 @@ export default function DashboardLayout({
             {/* XP Bar */}
             <div>
               <div className="flex justify-between text-xs text-[var(--text-muted)] mb-1">
-                <span>XP</span>
-                <span>{user?.totalXp || 0} / {xpRequired}</span>
+                <span>다음 레벨까지</span>
+                <span>{xpToNextLevel} XP</span>
               </div>
               <div className="h-2 bg-[var(--bg-primary)] rounded-full overflow-hidden">
                 <div
@@ -111,6 +111,16 @@ export default function DashboardLayout({
                 />
               </div>
             </div>
+
+            {/* Completed Lessons */}
+            {stats && (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[var(--text-muted)]">완료한 레슨</span>
+                <span className="text-[var(--accent-success)]">
+                  {stats.completedLessons}/{stats.totalLessons}
+                </span>
+              </div>
+            )}
 
             {/* Streak & Gems */}
             <div className="flex justify-between text-sm">

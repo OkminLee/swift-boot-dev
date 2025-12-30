@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { api, Track, Course } from "@/lib/api";
+import { api, Track, Course, CourseProgress } from "@/lib/api";
 
 const difficultyLabels: Record<string, { label: string; color: string }> = {
   beginner: { label: "입문", color: "text-[var(--accent-success)]" },
@@ -26,11 +26,20 @@ export default function CoursesPage() {
   const [tracks, setTracks] = useState<TrackWithCourses[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [courseProgressMap, setCourseProgressMap] = useState<Map<string, CourseProgress>>(new Map());
 
   useEffect(() => {
     async function loadTracks() {
       try {
-        const trackList = await api.getTracks();
+        const [trackList, progressList] = await Promise.all([
+          api.getTracks(),
+          api.getCourseProgress().catch(() => [] as CourseProgress[]),
+        ]);
+
+        // 코스별 진행률 맵 생성
+        const progressMap = new Map<string, CourseProgress>();
+        progressList.forEach((p) => progressMap.set(p.courseId, p));
+        setCourseProgressMap(progressMap);
 
         // 각 트랙의 코스 정보 로드
         const tracksWithCourses = await Promise.all(
@@ -123,42 +132,80 @@ export default function CoursesPage() {
             {/* Course Grid */}
             {track.courses.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {track.courses.map((course) => (
-                  <Link
-                    key={course.id}
-                    href={`/courses/${course.id}`}
-                    className="group bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-xl p-6 hover:border-[var(--accent-primary)] transition-all hover:shadow-lg"
-                  >
-                    {/* Icon */}
-                    <div className="w-12 h-12 bg-[var(--bg-elevated)] rounded-lg flex items-center justify-center mb-4">
-                      <span className="text-2xl">
-                        {course.icon === "book" && "📖"}
-                        {course.icon === "arrow.triangle.branch" && "🔀"}
-                        {!course.icon && "📚"}
-                      </span>
-                    </div>
+                {track.courses.map((course) => {
+                  const progress = courseProgressMap.get(course.id);
+                  const hasProgress = progress && progress.completedLessons > 0;
+                  const isCompleted = progress && progress.completedLessons === progress.totalLessons && progress.totalLessons > 0;
+                  const progressPercent = progress && progress.totalLessons > 0
+                    ? (progress.completedLessons / progress.totalLessons) * 100
+                    : 0;
 
-                    {/* Title & Description */}
-                    <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
-                      {course.title}
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--text-secondary)] line-clamp-2">
-                      {course.description}
-                    </p>
+                  return (
+                    <Link
+                      key={course.id}
+                      href={`/courses/${course.id}`}
+                      className={`group bg-[var(--bg-secondary)] border rounded-xl p-6 hover:border-[var(--accent-primary)] transition-all hover:shadow-lg ${
+                        isCompleted
+                          ? "border-[var(--accent-success)]"
+                          : "border-[var(--border-default)]"
+                      }`}
+                    >
+                      {/* Icon */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-12 h-12 bg-[var(--bg-elevated)] rounded-lg flex items-center justify-center">
+                          <span className="text-2xl">
+                            {course.icon === "book" && "📖"}
+                            {course.icon === "arrow.triangle.branch" && "🔀"}
+                            {!course.icon && "📚"}
+                          </span>
+                        </div>
+                        {isCompleted && (
+                          <span className="text-sm px-2 py-1 bg-[var(--accent-success)]/10 text-[var(--accent-success)] rounded-full font-medium">
+                            ✓ 완료
+                          </span>
+                        )}
+                      </div>
 
-                    {/* Meta */}
-                    <div className="mt-4 flex items-center justify-between">
-                      <span
-                        className={`text-sm font-medium ${difficultyLabels[course.difficulty]?.color || "text-[var(--text-muted)]"}`}
-                      >
-                        {difficultyLabels[course.difficulty]?.label || course.difficulty}
-                      </span>
-                      <span className="text-xs px-2 py-1 bg-[var(--bg-elevated)] text-[var(--text-muted)] rounded">
-                        시작하기 →
-                      </span>
-                    </div>
-                  </Link>
-                ))}
+                      {/* Title & Description */}
+                      <h3 className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
+                        {course.title}
+                      </h3>
+                      <p className="mt-2 text-sm text-[var(--text-secondary)] line-clamp-2">
+                        {course.description}
+                      </p>
+
+                      {/* Progress Bar */}
+                      {hasProgress && !isCompleted && (
+                        <div className="mt-4">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-[var(--text-muted)]">진행률</span>
+                            <span className="text-[var(--accent-success)]">
+                              {progress.completedLessons}/{progress.totalLessons}
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[var(--accent-success)] rounded-full transition-all duration-300"
+                              style={{ width: `${progressPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Meta */}
+                      <div className="mt-4 flex items-center justify-between">
+                        <span
+                          className={`text-sm font-medium ${difficultyLabels[course.difficulty]?.color || "text-[var(--text-muted)]"}`}
+                        >
+                          {difficultyLabels[course.difficulty]?.label || course.difficulty}
+                        </span>
+                        <span className="text-xs px-2 py-1 bg-[var(--bg-elevated)] text-[var(--text-muted)] rounded">
+                          {hasProgress ? "이어하기 →" : "시작하기 →"}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             ) : (
               <div className="bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-xl p-8 text-center">
