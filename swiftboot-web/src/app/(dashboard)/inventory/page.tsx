@@ -1,36 +1,87 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { api, InventoryItem } from "@/lib/api";
-import { ChestOpenModal, ChestRarity } from "@/components/gamification/ChestOpenModal";
+import { api, InventoryItem, UserChest, ChestOpenResponse, ChestRarity } from "@/lib/api";
+import { ChestOpenModal } from "@/components/gamification/ChestOpenModal";
+import { useAuth } from "@/stores/auth-store";
+
+// 등급별 아이콘 매핑
+const RARITY_ICONS: Record<ChestRarity, { badge: string; color: string }> = {
+  common: { badge: "", color: "var(--chest-common)" },
+  rare: { badge: "💎", color: "var(--chest-rare)" },
+  epic: { badge: "✨", color: "var(--chest-epic)" },
+  legendary: { badge: "👑", color: "var(--chest-legendary)" },
+};
+
+const RARITY_NAMES: Record<ChestRarity, string> = {
+  common: "일반",
+  rare: "희귀",
+  epic: "에픽",
+  legendary: "전설",
+};
 
 export default function InventoryPage() {
+  const { refreshUser } = useAuth();
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [unopenedChests, setUnopenedChests] = useState<UserChest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Chest 모달 상태
   const [chestModalOpen, setChestModalOpen] = useState(false);
-  const [selectedChestRarity, setSelectedChestRarity] = useState<ChestRarity>("common");
+  const [selectedChest, setSelectedChest] = useState<UserChest | null>(null);
+  const [chestOpenResult, setChestOpenResult] = useState<ChestOpenResponse | null>(null);
+  const [isOpening, setIsOpening] = useState(false);
 
-  useEffect(() => {
-    loadInventory();
-  }, []);
-
-  const loadInventory = async () => {
+  const loadData = useCallback(async () => {
     try {
-      const items = await api.getInventory();
+      const [items, chests] = await Promise.all([
+        api.getInventory(),
+        api.getUnopenedChests(),
+      ]);
       setInventory(items);
+      setUnopenedChests(chests);
     } catch (error) {
       console.error("Failed to load inventory:", error);
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleOpenChest = async (chest: UserChest) => {
+    if (isOpening) return;
+
+    setSelectedChest(chest);
+    setIsOpening(true);
+
+    try {
+      // API 호출 완료 후 모달 열기 (실제 보상 표시를 위해)
+      const result = await api.openChest(chest.id);
+      setChestOpenResult(result);
+      setChestModalOpen(true);
+    } catch (error) {
+      console.error("Failed to open chest:", error);
+      setSelectedChest(null);
+      // 에러 발생 시 사용자에게 알림
+      alert("상자를 여는 데 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsOpening(false);
+    }
   };
 
-  const openChest = (rarity: ChestRarity) => {
-    setSelectedChestRarity(rarity);
-    setChestModalOpen(true);
+  const handleCloseModal = async () => {
+    setChestModalOpen(false);
+    setSelectedChest(null);
+    setChestOpenResult(null);
+
+    // 사용자 정보 갱신 (XP, Gems, 레벨업 반영)
+    await refreshUser();
+    // 목록 새로고침 (개봉된 chest 제거)
+    await loadData();
   };
 
   if (isLoading) {
@@ -49,59 +100,76 @@ export default function InventoryPage() {
           인벤토리
         </h1>
         <p className="text-[var(--text-secondary)] mt-1">
-          보유한 아이템을 확인하세요
+          보유한 아이템과 상자를 확인하세요
         </p>
       </div>
 
-      {/* Chest Demo Section */}
+      {/* Unopened Chests Section */}
       <div className="mb-8 p-6 bg-gradient-to-r from-[var(--bg-secondary)] to-[var(--bg-elevated)] rounded-xl border border-[var(--border-default)]">
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl">📦</span>
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-            보유 상자
+            미개봉 상자
           </h2>
-          <span className="px-2 py-0.5 bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] text-xs rounded-full">
-            Demo
-          </span>
+          {unopenedChests.length > 0 && (
+            <span className="px-2 py-0.5 bg-[var(--accent-primary)] text-white text-xs font-bold rounded-full">
+              {unopenedChests.length}
+            </span>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Common Chest */}
-          <button
-            onClick={() => openChest("common")}
-            className="group flex flex-col items-center p-4 bg-[var(--bg-primary)] rounded-xl border-2 border-[var(--chest-common)]/30 hover:border-[var(--chest-common)] transition-all hover:scale-105"
-          >
-            <div className="text-5xl mb-2 group-hover:animate-chestShake">📦</div>
-            <span className="font-medium text-[var(--text-primary)]">일반 상자</span>
-            <span className="text-xs text-[var(--text-muted)] mt-1">클릭하여 열기</span>
-          </button>
-
-          {/* Rare Chest */}
-          <button
-            onClick={() => openChest("rare")}
-            className="group flex flex-col items-center p-4 bg-[var(--bg-primary)] rounded-xl border-2 border-[var(--chest-rare)]/30 hover:border-[var(--chest-rare)] transition-all hover:scale-105"
-          >
-            <div className="relative text-5xl mb-2 group-hover:animate-chestShake">
-              📦
-              <span className="absolute -top-1 -right-1 text-lg">💎</span>
-            </div>
-            <span className="font-medium text-[var(--chest-rare)]">희귀 상자</span>
-            <span className="text-xs text-[var(--text-muted)] mt-1">클릭하여 열기</span>
-          </button>
-
-          {/* Legendary Chest */}
-          <button
-            onClick={() => openChest("legendary")}
-            className="group flex flex-col items-center p-4 bg-[var(--bg-primary)] rounded-xl border-2 border-[var(--chest-legendary)]/30 hover:border-[var(--chest-legendary)] transition-all hover:scale-105"
-          >
-            <div className="relative text-5xl mb-2 group-hover:animate-chestShake">
-              📦
-              <span className="absolute -top-1 -right-1 text-lg">👑</span>
-            </div>
-            <span className="font-medium text-[var(--chest-legendary)]">전설 상자</span>
-            <span className="text-xs text-[var(--text-muted)] mt-1">클릭하여 열기</span>
-          </button>
-        </div>
+        {unopenedChests.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-5xl mb-3 opacity-50">📭</div>
+            <p className="text-[var(--text-secondary)]">
+              미개봉 상자가 없습니다
+            </p>
+            <p className="text-sm text-[var(--text-muted)] mt-1">
+              레슨을 완료하면 상자를 획득할 수 있어요!
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {unopenedChests.map((chest) => {
+              const rarityConfig = RARITY_ICONS[chest.chestRarity];
+              return (
+                <button
+                  key={chest.id}
+                  onClick={() => handleOpenChest(chest)}
+                  disabled={isOpening}
+                  className="group flex flex-col items-center p-4 bg-[var(--bg-primary)] rounded-xl border-2 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    borderColor: `${rarityConfig.color}40`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = rarityConfig.color;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = `${rarityConfig.color}40`;
+                  }}
+                >
+                  <div className="relative text-5xl mb-2 group-hover:animate-chestShake">
+                    📦
+                    {rarityConfig.badge && (
+                      <span className="absolute -top-1 -right-1 text-lg">
+                        {rarityConfig.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span
+                    className="font-medium text-sm"
+                    style={{ color: rarityConfig.color }}
+                  >
+                    {RARITY_NAMES[chest.chestRarity]} 상자
+                  </span>
+                  <span className="text-xs text-[var(--text-muted)] mt-1">
+                    클릭하여 열기
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Inventory Grid */}
@@ -161,11 +229,14 @@ export default function InventoryPage() {
       )}
 
       {/* Chest Open Modal */}
-      <ChestOpenModal
-        isOpen={chestModalOpen}
-        rarity={selectedChestRarity}
-        onClose={() => setChestModalOpen(false)}
-      />
+      {selectedChest && (
+        <ChestOpenModal
+          isOpen={chestModalOpen}
+          rarity={selectedChest.chestRarity}
+          apiReward={chestOpenResult?.reward}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }

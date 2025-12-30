@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 2.1
+**문서 버전:** 2.3
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -75,6 +75,7 @@
   - 레슨 완료 시 확률 기반 Chest 획득 (Common 30%, Rare 10%, Epic 3%)
   - ChestOpenModal: 4단계 등급, API 보상 연동
   - 레슨 정답 시 자동 Chest 개봉 모달 표시
+  - **인벤토리 페이지: 미개봉 Chest 표시 및 개봉 UI**
 - ✅ **"Swifty 만들기" 코스 (10개 레슨)**
   - 스토리 기반 Swift 기초 학습 (AI 챗봇 개발 컨셉)
   - Chapter 1: Swifty 깨우기 (print, 변수, 연산자)
@@ -110,8 +111,8 @@
 ### 다음 우선순위 작업
 
 1. 🔜 XP Potion, 코스메틱 아이템 추가
-2. 🔜 인벤토리 페이지: 미개봉 Chest 표시 및 개봉 UI
-3. 🔜 DataSwift 코스 추가 (데이터 분석 기초)
+2. 🔜 DataSwift 코스 추가 (데이터 분석 기초)
+3. 🔜 MDX 렌더링 설정 및 커스텀 컴포넌트 (Hint, Warning 박스)
 
 ---
 
@@ -778,6 +779,7 @@ jobs:
 | 2.0 | 2025-12-30 | **Phase 2A 완료**: 사운드 효과 시스템 구현 (Web Audio API), 정답/오답/레벨업 사운드, 사운드 on/off 토글 |
 | 2.1 | 2025-12-30 | **Chest 시스템 완성**: 백엔드 API (Chest/UserChest 모델, ChestController), 레슨 완료 시 확률 기반 Chest 획득, 자동 개봉 모달 |
 | 2.2 | 2025-12-30 | **추가 코스 콘텐츠**: Swifty 2.0 (5 chapters, 20 lessons, 650 XP), PixelQuest (6 chapters, 23 lessons, 825 XP) - Phase 2B 진행률 60% |
+| 2.3 | 2025-12-30 | **인벤토리 Chest 개봉 UI**: 미개봉 Chest 목록 조회, 클릭 시 개봉 API 연동, 실제 보상 표시, 사용자 상태 자동 갱신 |
 
 ---
 
