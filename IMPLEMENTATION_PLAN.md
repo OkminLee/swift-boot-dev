@@ -17,7 +17,7 @@
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
 | **Phase 1C** | 웹 클라이언트 MVP | ✅ 완료 | 100% |
 | **Phase 2A** | 게이미피케이션 | ✅ 완료 | 100% |
-| **Phase 2B** | 콘텐츠 & 폴리싱 | 🟡 진행중 | 20% |
+| **Phase 2B** | 콘텐츠 & 폴리싱 | 🟡 진행중 | 60% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
 
 ### 완료된 주요 작업
@@ -82,6 +82,23 @@
   - Chapter 3: Swifty의 기억 저장소 (Array, Dictionary)
   - Chapter 4: Swifty 고급 기능 (for-in, 함수)
   - 총 310 XP, 모든 레슨 실습 중심
+- ✅ **"Swifty 2.0 - AI 업그레이드" 코스 (20개 레슨)**
+  - Swifty 만들기 후속 코스 (중급)
+  - Chapter 1: 감정 시스템 (Enum, Struct)
+  - Chapter 2: 설정 시스템 (Optional)
+  - Chapter 3: 학습 시스템 (Closure)
+  - Chapter 4: 플러그인 시스템 (Protocol)
+  - Chapter 5: 안정성 강화 (Error Handling)
+  - 총 650 XP, 5 chapters
+- ✅ **"PixelQuest - 게임 개발자 되기" 코스 (23개 레슨)**
+  - 2D RPG 게임 시스템 구현 컨셉 (중급)
+  - Chapter 1: 영웅 탄생 (Class vs Struct)
+  - Chapter 2: 인벤토리 시스템 (Optional 심화)
+  - Chapter 3: 스킬 시스템 (Closure 심화)
+  - Chapter 4: 전투 시스템 (Protocol)
+  - Chapter 5: 퀘스트 시스템 (Generics)
+  - Chapter 6: 보스 전투 (종합 프로젝트)
+  - 총 825 XP, 6 chapters
 - ✅ **사운드 효과 시스템**
   - Web Audio API 기반 프로그래매틱 사운드 (sounds.ts)
   - 정답 시 성공 사운드 (상승 멜로디 C5→E5→G5)
@@ -93,8 +110,8 @@
 ### 다음 우선순위 작업
 
 1. 🔜 XP Potion, 코스메틱 아이템 추가
-2. 🔜 추가 코스 콘텐츠 (Course 2: SwiftPay 개발기)
-3. 🔜 인벤토리 페이지: 미개봉 Chest 표시 및 개봉 UI
+2. 🔜 인벤토리 페이지: 미개봉 Chest 표시 및 개봉 UI
+3. 🔜 DataSwift 코스 추가 (데이터 분석 기초)
 
 ---
 
@@ -760,6 +777,7 @@ jobs:
 | 1.9 | 2025-12-30 | "Swifty 만들기" 코스 완성: 스토리 기반 Swift 기초 10개 레슨 (310 XP), Phase 2B 시작 |
 | 2.0 | 2025-12-30 | **Phase 2A 완료**: 사운드 효과 시스템 구현 (Web Audio API), 정답/오답/레벨업 사운드, 사운드 on/off 토글 |
 | 2.1 | 2025-12-30 | **Chest 시스템 완성**: 백엔드 API (Chest/UserChest 모델, ChestController), 레슨 완료 시 확률 기반 Chest 획득, 자동 개봉 모달 |
+| 2.2 | 2025-12-30 | **추가 코스 콘텐츠**: Swifty 2.0 (5 chapters, 20 lessons, 650 XP), PixelQuest (6 chapters, 23 lessons, 825 XP) - Phase 2B 진행률 60% |
 
 ---
 

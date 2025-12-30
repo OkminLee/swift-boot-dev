@@ -26,8 +26,12 @@ SwiftBoot은 게이미피케이션 기반 코딩 교육 플랫폼입니다.
 - [x] 데이터 모델 (Track, Course, Chapter, Lesson)
 - [x] 샘플 콘텐츠 시드 데이터
   - Swift Developer 트랙
-  - Swift 기초, Swift 제어문 코스
-  - 11개 레슨 (175 XP)
+  - Swift 기초, Swift 제어문 코스 (11개 레슨, 175 XP)
+  - Swifty 만들기 코스 (10개 레슨, AI 챗봇 개발)
+  - **Swifty 2.0 - AI 업그레이드** (5 chapters, 20 lessons, 650 XP)
+    - Enum, Struct, Optional, Closure, Protocol, Error Handling
+  - **PixelQuest - 게임 개발자 되기** (6 chapters, 23 lessons, 825 XP)
+    - Class vs Struct, Optional 심화, Closure 캡처, Protocol 상속, Generics
 - [x] 학습 API 엔드포인트
   - GET /tracks, /tracks/:id
   - GET /courses, /courses/:id
@@ -96,3 +100,5 @@ npm run dev
 - Monaco Editor 커스텀 테마 적용
 - Course 목록/상세 페이지 구현
 - Lesson 학습 페이지 구현
+- **Swifty 2.0 코스 추가** (Enum, Struct, Optional, Closure, Protocol, Error Handling)
+- **PixelQuest 코스 추가** (Class vs Struct, Optional 심화, Closure, Protocol, Generics)
