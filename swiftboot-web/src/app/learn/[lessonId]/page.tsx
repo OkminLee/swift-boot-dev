@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { api, Lesson, SubmissionResponse, Language } from "@/lib/api";
+import { api, Lesson, SubmissionResponse, Language, InventoryItem, SeerStoneResponse } from "@/lib/api";
 import { CodeEditor, OutputViewer } from "@/components/CodeEditor";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 import { useAuthStore } from "@/stores/auth-store";
@@ -27,6 +27,12 @@ export default function LessonPage() {
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "idle">("idle");
   const resultRef = useRef<SubmissionResponse | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Seer Stone 관련 상태
+  const [seerStoneCount, setSeerStoneCount] = useState(0);
+  const [showSolution, setShowSolution] = useState(false);
+  const [solutionCode, setSolutionCode] = useState<string | null>(null);
+  const [isUsingSeerStone, setIsUsingSeerStone] = useState(false);
 
   // localStorage 키
   const storageKey = `swiftboot-code-${lessonId}`;
@@ -102,7 +108,41 @@ export default function LessonPage() {
       }
     }
     loadLesson();
+    loadSeerStoneCount();
   }, [lessonId, storageKey]);
+
+  // Seer Stone 보유 수량 로드
+  const loadSeerStoneCount = async () => {
+    try {
+      const inventory = await api.getInventory();
+      const seerStone = inventory.find((item) => item.item.itemType === "seerStone");
+      setSeerStoneCount(seerStone?.quantity || 0);
+    } catch (error) {
+      console.error("Failed to load inventory:", error);
+    }
+  };
+
+  // Seer Stone 사용
+  const handleUseSeerStone = async () => {
+    if (seerStoneCount <= 0 || isUsingSeerStone) return;
+
+    setIsUsingSeerStone(true);
+    try {
+      const response = await api.useSeerStone(lessonId);
+      if (response.success && response.solutionCode) {
+        setSolutionCode(response.solutionCode);
+        setShowSolution(true);
+        setSeerStoneCount(response.remainingQuantity);
+      } else {
+        alert(response.message);
+      }
+    } catch (error) {
+      console.error("Failed to use Seer Stone:", error);
+      alert("Seer Stone 사용 중 오류가 발생했습니다.");
+    } finally {
+      setIsUsingSeerStone(false);
+    }
+  };
 
   // 코드 변경 시 자동 저장 (debounce 1초)
   const handleCodeChange = useCallback((newCode: string) => {
@@ -225,6 +265,23 @@ export default function LessonPage() {
 
           {isCodeLesson && (
             <div className="flex items-center gap-2">
+              {/* Seer Stone 버튼 */}
+              {seerStoneCount > 0 && !showSolution && (
+                <button
+                  onClick={handleUseSeerStone}
+                  disabled={isUsingSeerStone}
+                  className="px-3 py-2 text-sm bg-[var(--gem-purple)]/10 text-[var(--gem-purple)] hover:bg-[var(--gem-purple)]/20 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                  title={`Seer Stone ${seerStoneCount}개 보유`}
+                >
+                  {isUsingSeerStone ? (
+                    <div className="animate-spin w-4 h-4 border-2 border-[var(--gem-purple)] border-t-transparent rounded-full" />
+                  ) : (
+                    <span>🔮</span>
+                  )}
+                  <span>정답 보기</span>
+                  <span className="text-xs opacity-70">({seerStoneCount})</span>
+                </button>
+              )}
               <button
                 onClick={handleReset}
                 className="px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
@@ -324,6 +381,43 @@ export default function LessonPage() {
 
             {/* 오른쪽: 코드 에디터 */}
             <div className={`space-y-4 transition-transform ${isShaking ? "animate-shake" : ""}`}>
+              {/* Seer Stone 정답 표시 */}
+              {showSolution && solutionCode && (
+                <div className="bg-[var(--gem-purple)]/10 border border-[var(--gem-purple)] rounded-lg p-4 animate-slideUp">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">🔮</span>
+                      <span className="font-medium text-[var(--gem-purple)]">정답 코드</span>
+                    </div>
+                    <button
+                      onClick={() => setShowSolution(false)}
+                      className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="bg-[var(--bg-primary)] rounded-lg overflow-hidden">
+                    <SyntaxHighlighter
+                      style={vscDarkPlus}
+                      language={lesson.language || "swift"}
+                      customStyle={{
+                        margin: 0,
+                        padding: "1rem",
+                        fontSize: "14px",
+                        background: "transparent",
+                      }}
+                    >
+                      {solutionCode}
+                    </SyntaxHighlighter>
+                  </div>
+                  <p className="text-xs text-[var(--text-muted)] mt-2">
+                    * 정답을 참고하여 직접 입력해보세요!
+                  </p>
+                </div>
+              )}
+
               {/* 에디터 헤더: 저장 상태 표시 */}
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs text-[var(--text-muted)] font-mono">
