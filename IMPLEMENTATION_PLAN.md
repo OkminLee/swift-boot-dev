@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 1.7
+**문서 버전:** 1.8
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -16,7 +16,7 @@
 | **Phase 1A** | 백엔드 MVP | ✅ 완료 | 100% |
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
 | **Phase 1C** | 웹 클라이언트 MVP | ✅ 완료 | 100% |
-| **Phase 2A** | 게이미피케이션 | 🟡 진행중 | 70% |
+| **Phase 2A** | 게이미피케이션 | 🟡 진행중 | 80% |
 | **Phase 2B** | 콘텐츠 & 폴리싱 | ⬜ 대기 | 0% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
 
@@ -68,13 +68,18 @@
   - 인벤토리 페이지: 보유 아이템 표시
   - 레슨 페이지: Seer Stone으로 정답 보기 기능
   - 첫 레슨 완료 시 5💎 Gems 지급
+- ✅ **Chest 개봉 모달 MVP**
+  - ChestOpenModal 컴포넌트 (Common/Rare/Legendary 등급)
+  - 3단계 애니메이션: 흔들림 → 열기 → 보상 표시
+  - 등급별 Confetti 효과 (canvas-confetti)
+  - 인벤토리 페이지 데모 연동
 
 ### 다음 우선순위 작업
 
 1. 🔜 추가 Swift 레슨 콘텐츠 작성
-2. 🔜 Chest 개봉 모달 및 애니메이션
-3. 🔜 사운드 효과 (정답/오답/레벨업)
-4. 🔜 XP Potion, 코스메틱 아이템 추가
+2. 🔜 사운드 효과 (정답/오답/레벨업)
+3. 🔜 XP Potion, 코스메틱 아이템 추가
+4. 🔜 Chest 백엔드 API (보상 로직)
 
 ---
 
@@ -531,9 +536,10 @@ Level 10→11: ~3,162 XP
   - [x] Seer Stone (정답 보기) *(ShopController, InventoryController)*
   - [ ] XP Potion (경험치 부스터)
   - [ ] 코스메틱 아이템
-- [ ] Chest 개봉 모달
-  - [ ] 등급별 애니메이션 (Common, Rare, Legendary)
-  - [ ] canvas-confetti 통합
+- [x] Chest 개봉 모달 *(ChestOpenModal.tsx, globals.css)*
+  - [x] 등급별 애니메이션 (Common, Rare, Legendary)
+  - [x] canvas-confetti 통합
+  - [ ] 백엔드 Chest 모델 및 보상 API
 - [x] 인벤토리 페이지 *(swiftboot-web/src/app/(dashboard)/inventory/page.tsx)*
 - [x] 첫 레슨 완료 시 Gems 지급 *(CodeExecutionService - 5💎)*
 
@@ -735,6 +741,7 @@ jobs:
 | 1.5 | 2025-12-30 | Phase 1A 완료: Redis 기반 Rate Limiting 미들웨어 (IP/사용자별, 엔드포인트별 설정) |
 | 1.6 | 2025-12-30 | Phase 1C 완료 & Phase 2A 진행: Zustand 마이그레이션, 게이미피케이션 피드백 (Confetti, 흔들림, 레벨업 모달), 레슨 네비게이션 API, 에디터 자동저장/구문강조 |
 | 1.7 | 2025-12-30 | 상점/인벤토리 시스템 MVP 완료: ShopItem/UserInventory 모델, 상점/인벤토리 페이지, Seer Stone 정답 보기, 첫 레슨 완료 시 Gems 지급 |
+| 1.8 | 2025-12-30 | Chest 개봉 모달 MVP: ChestOpenModal 컴포넌트, 등급별 애니메이션 (chestShake/chestOpen/rewardPop), 인벤토리 페이지 데모 연동 |
 
 ---
 
