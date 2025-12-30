@@ -110,6 +110,38 @@ export interface CourseProgress {
   totalLessons: number;
 }
 
+// Shop types
+export type ShopItemType = "seerStone" | "xpPotion" | "cosmetic";
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  itemType: ShopItemType;
+  price: number;
+  icon: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  item: ShopItem;
+  quantity: number;
+}
+
+export interface PurchaseResponse {
+  success: boolean;
+  message: string;
+  remainingGems: number;
+  inventoryItem: InventoryItem | null;
+}
+
+export interface SeerStoneResponse {
+  success: boolean;
+  message: string;
+  solutionCode: string | null;
+  remainingQuantity: number;
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -283,6 +315,28 @@ class ApiClient {
     return this.request<SubmissionResponse>(`/lessons/${lessonId}/submit`, {
       method: "POST",
       body: JSON.stringify({ code, language }),
+    });
+  }
+
+  // Shop
+  async getShopItems(): Promise<ShopItem[]> {
+    return this.request<ShopItem[]>("/shop");
+  }
+
+  async purchaseItem(itemId: string): Promise<PurchaseResponse> {
+    return this.request<PurchaseResponse>(`/shop/purchase/${itemId}`, {
+      method: "POST",
+    });
+  }
+
+  // Inventory
+  async getInventory(): Promise<InventoryItem[]> {
+    return this.request<InventoryItem[]>("/inventory");
+  }
+
+  async useSeerStone(lessonId: string): Promise<SeerStoneResponse> {
+    return this.request<SeerStoneResponse>(`/inventory/use/seer-stone/${lessonId}`, {
+      method: "POST",
     });
   }
 }

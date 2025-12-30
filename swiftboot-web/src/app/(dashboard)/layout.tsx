@@ -66,6 +66,20 @@ export default function DashboardLayout({
             <span>코스</span>
           </Link>
           <Link
+            href="/shop"
+            className="flex items-center gap-3 px-3 py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
+          >
+            <span>🏪</span>
+            <span>상점</span>
+          </Link>
+          <Link
+            href="/inventory"
+            className="flex items-center gap-3 px-3 py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
+          >
+            <span>🎒</span>
+            <span>인벤토리</span>
+          </Link>
+          <Link
             href="/profile"
             className="flex items-center gap-3 px-3 py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
           >
@@ -128,10 +142,13 @@ export default function DashboardLayout({
                 <span>🔥</span>
                 <span className="text-[var(--streak-orange)]">{user?.streakDays || 0}일</span>
               </div>
-              <div className="flex items-center gap-1">
+              <Link
+                href="/shop"
+                className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+              >
                 <span>💎</span>
                 <span className="text-[var(--gem-purple)]">{user?.gems || 0}</span>
-              </div>
+              </Link>
             </div>
 
             {/* Logout */}
