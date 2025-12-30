@@ -1,10 +1,24 @@
 "use client";
 
-import { useRef, useCallback, useEffect } from "react";
-import Editor, { OnMount, OnChange } from "@monaco-editor/react";
+import { useRef, useCallback, useEffect, Suspense, lazy } from "react";
+import dynamic from "next/dynamic";
+import type { OnMount, OnChange } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { swiftbootTheme, languageDefaults } from "@/lib/monaco-theme";
 import { Language } from "@/lib/api";
+
+// Monaco Editor 동적 import (코드 스플리팅)
+const Editor = dynamic(() => import("@monaco-editor/react").then(mod => mod.default), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full bg-[var(--bg-editor)]">
+      <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+        <div className="animate-spin w-5 h-5 border-2 border-[var(--accent-primary)] border-t-transparent rounded-full" />
+        <span>에디터 로딩 중...</span>
+      </div>
+    </div>
+  ),
+});
 
 export type { Language };
 
@@ -127,14 +141,6 @@ export function CodeEditor({
           automaticLayout: true,
           padding: { top: 12, bottom: 12 },
         }}
-        loading={
-          <div className="flex items-center justify-center h-full bg-[var(--bg-editor)]">
-            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-              <div className="animate-spin w-5 h-5 border-2 border-[var(--accent-primary)] border-t-transparent rounded-full" />
-              <span>에디터 로딩 중...</span>
-            </div>
-          </div>
-        }
       />
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/stores/auth-store";
@@ -136,10 +137,13 @@ export default function DashboardLayout({
             {/* User Info */}
             <div className="flex items-center gap-3 pb-3 border-b border-[var(--border-default)]">
               {user?.avatarUrl ? (
-                <img
+                <Image
                   src={user.avatarUrl}
-                  alt={user.username}
-                  className="w-10 h-10 rounded-full"
+                  alt={user.username || "User avatar"}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                  priority={false}
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-[var(--accent-primary)] flex items-center justify-center text-white font-bold">
