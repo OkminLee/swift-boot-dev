@@ -190,13 +190,18 @@ struct CodeExecutionService {
             try await newProgress.save(on: db)
         }
 
-        // 사용자 XP 업데이트
+        // 사용자 XP 및 Gems 업데이트
         guard let user = try await User.find(userId, on: db) else {
             return 0
         }
 
         let xpEarned = lesson.xpReward
         _ = user.addXp(xpEarned)
+
+        // 첫 레슨 완료 시 Gems 지급 (5💎)
+        let gemsReward = 5
+        user.gems += gemsReward
+
         try await user.save(on: db)
 
         return xpEarned

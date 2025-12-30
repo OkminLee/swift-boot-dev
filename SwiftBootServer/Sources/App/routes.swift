@@ -26,4 +26,8 @@ func routes(_ app: Application) throws {
     try api.register(collection: TrackController())
     try api.register(collection: CourseController())
     try api.register(collection: LessonController())
+
+    // Shop routes
+    try api.register(collection: ShopController())
+    try api.register(collection: InventoryController())
 }
