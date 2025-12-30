@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { api, Lesson, SubmissionResponse, Language, InventoryItem, SeerStoneResponse } from "@/lib/api";
+import { api, Lesson, SubmissionResponse, Language, EarnedChestInfo, ChestOpenResponse } from "@/lib/api";
 import { CodeEditor, OutputViewer } from "@/components/CodeEditor";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
+import { ChestOpenModal } from "@/components/gamification/ChestOpenModal";
 import { useAuthStore } from "@/stores/auth-store";
 import { playSuccess, playError } from "@/lib/sounds";
 import ReactMarkdown from "react-markdown";
@@ -34,6 +35,12 @@ export default function LessonPage() {
   const [showSolution, setShowSolution] = useState(false);
   const [solutionCode, setSolutionCode] = useState<string | null>(null);
   const [isUsingSeerStone, setIsUsingSeerStone] = useState(false);
+
+  // Chest 관련 상태
+  const [earnedChest, setEarnedChest] = useState<EarnedChestInfo | null>(null);
+  const [chestOpenResult, setChestOpenResult] = useState<ChestOpenResponse | null>(null);
+  const [showChestModal, setShowChestModal] = useState(false);
+  const [isOpeningChest, setIsOpeningChest] = useState(false);
 
   // localStorage 키
   const storageKey = `swiftboot-code-${lessonId}`;
@@ -71,6 +78,26 @@ export default function LessonPage() {
   const levelUpInfo = useAuthStore((state) => state.levelUpInfo);
   const clearLevelUp = useAuthStore((state) => state.clearLevelUp);
 
+  // Chest 개봉 처리
+  const handleOpenChest = useCallback(async (chest: EarnedChestInfo) => {
+    if (isOpeningChest) return;
+    setIsOpeningChest(true);
+
+    try {
+      const openResult = await api.openChest(chest.id);
+      setChestOpenResult(openResult);
+      setShowChestModal(true);
+      // 보상 반영을 위해 사용자 정보 새로고침
+      refreshUser();
+    } catch (error) {
+      console.error("Failed to open chest:", error);
+      // 실패해도 모달은 표시 (기본 보상으로)
+      setShowChestModal(true);
+    } finally {
+      setIsOpeningChest(false);
+    }
+  }, [isOpeningChest, refreshUser]);
+
   // 결과에 따른 효과 발동
   useEffect(() => {
     if (!result || result === resultRef.current) return;
@@ -81,12 +108,21 @@ export default function LessonPage() {
       playSuccess();
       // XP 획득 시 사용자 정보 새로고침
       refreshUser();
+
+      // Chest 획득 시 자동 개봉
+      if (result.earnedChest) {
+        setEarnedChest(result.earnedChest);
+        // 약간의 딜레이 후 개봉 (정답 효과를 보여준 후)
+        setTimeout(() => {
+          handleOpenChest(result.earnedChest!);
+        }, 1500);
+      }
     } else if (result.status === "failure") {
       setIsShaking(true);
       playError();
       setTimeout(() => setIsShaking(false), 500);
     }
-  }, [result, fireConfetti, refreshUser]);
+  }, [result, fireConfetti, refreshUser, handleOpenChest]);
 
   // 레슨 데이터 로드 + 저장된 코드 복원
   useEffect(() => {
@@ -609,6 +645,20 @@ export default function LessonPage() {
         newLevel={levelUpInfo?.newLevel ?? 0}
         onClose={clearLevelUp}
       />
+
+      {/* Chest 개봉 모달 */}
+      {earnedChest && (
+        <ChestOpenModal
+          isOpen={showChestModal}
+          rarity={earnedChest.rarity}
+          apiReward={chestOpenResult?.reward}
+          onClose={() => {
+            setShowChestModal(false);
+            setEarnedChest(null);
+            setChestOpenResult(null);
+          }}
+        />
+      )}
     </div>
   );
 }
