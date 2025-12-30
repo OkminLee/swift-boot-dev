@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 2.5
+**문서 버전:** 2.6
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -17,7 +17,7 @@
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
 | **Phase 1C** | 웹 클라이언트 MVP | ✅ 완료 | 100% |
 | **Phase 2A** | 게이미피케이션 | ✅ 완료 | 100% |
-| **Phase 2B** | 콘텐츠 & 폴리싱 | 🟡 진행중 | 85% |
+| **Phase 2B** | 콘텐츠 & 폴리싱 | 🟡 진행중 | 90% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
 
 ### 완료된 주요 작업
@@ -124,16 +124,21 @@
   - 이미지 포맷 최적화 (AVIF, WebP)
   - 메타데이터 강화 (SEO, Open Graph, Twitter Card)
   - Viewport export 분리 (Next.js 14+ 권장사항)
+- ✅ **E2E 테스트 (Playwright)**
+  - Playwright 설치 및 설정 (playwright.config.ts)
+  - 랜딩/로그인 페이지 테스트 (17개 통과)
+  - 코스/레슨/상점/인벤토리 테스트 준비 (백엔드 연동 후 활성화)
+  - npm test, test:ui, test:headed, test:report 스크립트
 
 ### 다음 우선순위 작업
 
 1. 🔜 DataSwift 코스 추가 (데이터 분석 기초)
-2. 🔜 E2E 테스트 (Playwright)
 
 ### 낮은 우선순위 (Backlog)
 
 - ⏳ XP Potion, 코스메틱 아이템 추가
-- ⏳ E2E 테스트 (Playwright)
+- ⏳ 접근성 검수 (axe-core)
+- ⏳ 브라우저 호환성 테스트 (Chrome, Firefox, Safari, Edge)
 
 ---
 
@@ -636,7 +641,10 @@ Level 10→11: ~3,162 XP
   - [x] 이미지 최적화 (next/image, AVIF/WebP 포맷)
   - [x] 코드 스플리팅 (Monaco Editor 동적 import)
   - [x] 폰트 최적화 (next/font/google)
-- [ ] E2E 테스트 (Playwright)
+- [x] E2E 테스트 (Playwright)
+  - [x] Playwright 설치 및 playwright.config.ts 설정
+  - [x] 랜딩/로그인 페이지 테스트 (17개 통과)
+  - [x] 코스/레슨/상점/인벤토리 테스트 준비 (백엔드 연동 후 활성화)
 - [ ] 접근성 검수 (axe-core)
 - [ ] 브라우저 호환성 테스트
   - [ ] Chrome, Firefox, Safari, Edge
@@ -803,6 +811,7 @@ jobs:
 | 2.3 | 2025-12-30 | **인벤토리 Chest 개봉 UI**: 미개봉 Chest 목록 조회, 클릭 시 개봉 API 연동, 실제 보상 표시, 사용자 상태 자동 갱신 |
 | 2.4 | 2025-12-30 | **MDX 렌더링 구현**: next-mdx-remote/remark-directive 통합, Hint/Warning/Info/CodeBlock 컴포넌트, Phase 2B 진행률 70% |
 | 2.5 | 2025-12-30 | **안정성 & 성능 최적화**: ErrorBoundary/error.tsx/not-found.tsx 에러 처리, Monaco Editor 동적 import, next/image 최적화, SEO 메타데이터 강화, Phase 2B 진행률 85% |
+| 2.6 | 2025-12-30 | **E2E 테스트 구현**: Playwright 설치/설정, 랜딩/로그인 테스트 17개 통과, 코스/레슨/상점 테스트 준비 (백엔드 연동 후 활성화), Phase 2B 진행률 90% |
 
 ---
 
