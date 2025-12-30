@@ -25,14 +25,14 @@ struct LessonController: RouteCollection {
         // 레슨과 챕터 정보 함께 로드
         guard let lesson = try await Lesson.query(on: req.db)
             .filter(\.$id == lessonId)
-            .with(\.$chapter) { chapter in
-                chapter.with(\.$course)
-            }
-            .first() else {
+            .with(\.$chapter)
+            .first()
+        else {
             throw Abort(.notFound)
         }
 
         let chapter = lesson.chapter
+        try await chapter.$course.load(on: req.db)
         let courseId = chapter.$course.id
 
         // 같은 코스의 모든 챕터와 레슨 조회 (순서대로)
