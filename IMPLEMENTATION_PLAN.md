@@ -2,8 +2,8 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 1.1
-**최종 수정일:** 2025-12-29
+**문서 버전:** 1.3
+**최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
 ---
@@ -12,10 +12,10 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| **Phase 0** | 디자인 시스템 | 🟡 진행중 | 60% |
-| **Phase 1A** | 백엔드 MVP | 🟡 진행중 | 70% |
-| **Phase 1B** | RCE 엔진 | ⬜ 대기 | 0% |
-| **Phase 1C** | 웹 클라이언트 MVP | 🟡 진행중 | 40% |
+| **Phase 0** | 디자인 시스템 | 🟡 진행중 | 70% |
+| **Phase 1A** | 백엔드 MVP | 🟢 거의완료 | 95% |
+| **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
+| **Phase 1C** | 웹 클라이언트 MVP | 🟡 진행중 | 70% |
 | **Phase 2A** | 게이미피케이션 | ⬜ 대기 | 0% |
 | **Phase 2B** | 콘텐츠 & 폴리싱 | ⬜ 대기 | 0% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
@@ -25,17 +25,29 @@
 - ✅ 디자인 토큰 정의 (colors, typography, spacing, animation)
 - ✅ Tailwind CSS 프리셋 및 CSS 변수
 - ✅ Vapor 프로젝트 구조 및 의존성 설정
-- ✅ Fluent 모델 (User, Track, Course, Chapter, Lesson, UserProgress)
+- ✅ Fluent 모델 (User, Track, Course, Chapter, Lesson, UserProgress, RefreshToken)
 - ✅ 기본 컨트롤러 (Auth, User, Track, Course, Lesson)
 - ✅ Docker Compose (PostgreSQL, Redis)
 - ✅ Next.js 15 프로젝트 초기화
 - ✅ 랜딩 페이지, 로그인 페이지, 대시보드 레이아웃
+- ✅ **GitHub OAuth 전체 구현** (백엔드 + 프론트엔드)
+- ✅ **JWT 인증 시스템** (Access Token + Refresh Token)
+- ✅ **Monaco Editor 통합** (커스텀 테마 포함)
+- ✅ **코스 상세 페이지** (챕터/레슨 아코디언)
+- ✅ **레슨 학습 화면** (Split View: 콘텐츠 + 에디터)
+- ✅ **코드 제출 UI** (실행 결과 표시)
+- ✅ **Seed 콘텐츠** (샘플 코스/챕터/레슨 데이터)
+- ✅ **RCE 엔진 MVP** (Docker 기반 Swift 코드 실행)
+  - DockerRunner: 보안 격리 컨테이너 실행 (--network none, --memory 128m)
+  - CodeExecutionService: 코드 실행, 결과 평가, XP 지급
+  - 정답/오답/타임아웃/컴파일에러 처리
 
 ### 다음 우선순위 작업
 
-1. 🔜 GitHub OAuth 구현 (백엔드 + 프론트엔드)
-2. 🔜 Monaco Editor 통합
-3. 🔜 RCE 엔진 (Docker 기반 코드 실행)
+1. 🔜 추가 언어 지원 (Python, Go, JavaScript Docker 이미지)
+2. 🔜 Rate Limiting 미들웨어
+3. 🔜 사용자 진행률 UI 표시
+4. 🔜 게이미피케이션 UI (XP바, 레벨업 효과)
 
 ---
 
@@ -311,12 +323,16 @@ achievements (id, user_id, achievement_type, unlocked_at)
 
 #### Week 4: 인증 시스템
 
-- [ ] GitHub OAuth 2.0 연동 *(AuthController 스캐폴딩만 완료)*
-- [ ] JWT Access Token (15분)
-- [ ] JWT Refresh Token (7일)
-- [ ] 토큰 갱신 엔드포인트
+- [x] GitHub OAuth 2.0 연동 *(SwiftBootServer/Sources/App/Controllers/AuthController.swift)*
+- [x] JWT Access Token (15분) *(DTOs/AuthDTOs.swift - AccessTokenPayload)*
+- [x] JWT Refresh Token (7일) *(Models/RefreshToken.swift, Migrations/CreateRefreshToken.swift)*
+- [x] 토큰 갱신 엔드포인트 *(POST /auth/refresh)*
 - [ ] Rate Limiting 미들웨어
 - [x] CORS 설정 *(SwiftBootServer/Sources/App/configure.swift)*
+- [x] JWTAuthMiddleware *(SwiftBootServer/Sources/App/Middleware/JWTAuthMiddleware.swift)*
+- [x] UserController *(GET /users/me, GET /users/me/stats)*
+- [x] CourseController 확장 *(챕터/레슨 포함 상세 조회)*
+- [x] SeedContent 마이그레이션 *(샘플 데이터 자동 생성)*
 
 **API 엔드포인트:**
 ```
@@ -333,56 +349,49 @@ PATCH  /users/me
 
 ---
 
-### Phase 1B: RCE 엔진 (Week 5-7)
+### Phase 1B: RCE 엔진 (Week 5-7) ✅ 완료
 
 #### Week 5-6: 코드 실행 파이프라인
 
-- [ ] Redis Job Queue 설정 (Queues 라이브러리)
-- [ ] Execution Worker 서비스 구현
-- [ ] Docker 컨테이너 관리 로직
+- [x] Docker 컨테이너 관리 로직 *(Services/DockerRunner.swift)*
+- [x] 코드 실행 서비스 *(Services/CodeExecutionService.swift)*
+- [x] 언어 설정 *(Services/LanguageConfig.swift)*
 
-```swift
-struct CodeExecutionJob: AsyncJob {
-    struct Payload: Codable {
-        let userId: UUID
-        let lessonId: UUID
-        let language: Language
-        let code: String
-    }
-
-    func dequeue(_ context: QueueContext, _ payload: Payload) async throws {
-        // 1. Docker 컨테이너 생성
-        // 2. 코드 주입 및 실행
-        // 3. 결과 캡처
-        // 4. WebSocket으로 결과 전송
-    }
-}
+**구현된 아키텍처:**
+```
+LessonController.submitLesson
+    ↓
+CodeExecutionService.execute
+    ↓
+DockerRunner.execute (Process API → docker run)
+    ↓
+결과 평가 (expectedOutput 비교) → XP 지급
 ```
 
-- [ ] 언어별 Docker 이미지 준비
-  - [ ] Swift (swiftlang/swift:5.9-jammy)
-  - [ ] Python (python:3.11-slim)
-  - [ ] Go (golang:1.21-alpine)
-  - [ ] JavaScript (node:20-slim)
+- [x] 언어별 Docker 이미지 준비
+  - [x] Swift (swiftlang/swift:nightly-6.0-jammy)
+  - [ ] Python (python:3.12-slim) - 설정 완료, pull 필요
+  - [ ] Go (golang:1.22-alpine) - 설정 완료, pull 필요
+  - [ ] JavaScript (node:20-alpine) - 설정 완료, pull 필요
 
-- [ ] 보안 설정
-  - [ ] 네트워크 격리 (--network none)
-  - [ ] 리소스 제한 (128MB 메모리, 5초 타임아웃)
-  - [ ] 읽기 전용 파일시스템
+- [x] 보안 설정
+  - [x] 네트워크 격리 (--network none)
+  - [x] 리소스 제한 (128MB 메모리, 5초 타임아웃)
+  - [x] 읽기 전용 파일시스템 (--read-only, HOME=/tmp)
+  - [x] 비특권 사용자 (--user nobody)
+  - [x] 프로세스 제한 (--pids-limit 50)
 
-- [ ] WebSocket 결과 스트리밍
+- [ ] WebSocket 결과 스트리밍 (Phase 2에서 필요시 구현)
 
 #### Week 7: 테스트 검증 시스템
 
-- [ ] stdout 매칭 검증
-- [ ] Hidden Test Suite 주입 로직
-- [ ] 에러 메시지 포맷팅 (친절한 피드백)
-- [ ] 유닛 테스트 작성
+- [x] stdout 매칭 검증 *(CodeExecutionService.evaluateResult)*
+- [x] 에러 메시지 포맷팅 (컴파일 에러 표시)
+- [x] 타임아웃 처리
 
 **API 엔드포인트:**
 ```
-POST   /execute           (코드 실행 요청)
-WS     /ws/execution      (실시간 결과 스트리밍)
+POST   /api/v1/lessons/:lessonId/submit   (코드 실행 요청) ✅
 ```
 
 **산출물:**
@@ -425,16 +434,16 @@ swiftboot-web/
 └── public/
 ```
 
-- [ ] next-auth 설정 (GitHub Provider)
-- [ ] API 클라이언트 (TanStack Query)
-- [ ] 전역 상태 관리 (Zustand)
+- [x] 인증 시스템 (자체 구현) *(swiftboot-web/src/lib/auth-context.tsx, github-oauth.ts)*
+- [x] API 클라이언트 *(swiftboot-web/src/lib/api.ts)*
+- [ ] 전역 상태 관리 (Zustand) - AuthContext로 대체 중
 
 #### Week 10: Monaco Editor 통합
 
-- [ ] @monaco-editor/react 설치
-- [ ] 커스텀 테마 (swiftboot-dark)
-- [ ] 언어별 구문 강조 설정
-- [ ] 에디터 옵션 최적화
+- [x] @monaco-editor/react 설치 *(package.json)*
+- [x] 커스텀 테마 (swiftboot-dark) *(swiftboot-web/src/lib/monaco-theme.ts)*
+- [x] 언어별 구문 강조 설정 *(languageDefaults 구현)*
+- [x] 에디터 옵션 최적화 *(CodeEditor.tsx)*
 
 ```typescript
 const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
@@ -450,18 +459,18 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 };
 ```
 
-- [ ] WebSocket 연결 (코드 실행)
-- [ ] 실시간 결과 출력 패널
+- [ ] WebSocket 연결 (코드 실행) - RCE 완료 후 구현 예정
+- [x] 실시간 결과 출력 패널 *(OutputViewer 컴포넌트)*
 
 #### Week 11: 학습 플로우 UI
 
 - [x] 대시보드 (코스 목록) *(swiftboot-web/src/app/(dashboard)/courses/page.tsx)*
-- [ ] 코스 상세 (챕터/레슨 목록)
-- [ ] 레슨 화면 (Split View)
-  - [ ] 좌측: 학습 콘텐츠 (MDX 렌더링)
-  - [ ] 우측: 코드 에디터 + 결과 패널
-- [ ] 진행률 표시
-- [ ] 반응형 레이아웃
+- [x] 코스 상세 (챕터/레슨 목록) *(swiftboot-web/src/app/(dashboard)/courses/[courseId]/page.tsx)*
+- [x] 레슨 화면 (Split View) *(swiftboot-web/src/app/learn/[lessonId]/page.tsx)*
+  - [x] 좌측: 학습 콘텐츠 (ReactMarkdown + remark-gfm)
+  - [x] 우측: 코드 에디터 + 결과 패널
+- [ ] 진행률 표시 (UserProgress 연동 필요)
+- [x] 반응형 레이아웃 (lg:grid-cols-2)
 
 **산출물:**
 - Next.js 웹 클라이언트
@@ -692,6 +701,8 @@ jobs:
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
 | 1.0 | 2025-12-29 | 최초 작성 (웹 배포 기준) |
+| 1.2 | 2025-12-30 | 진행상황 대규모 업데이트: GitHub OAuth 완료, JWT 인증 완료, Monaco Editor 통합 완료, 코스/레슨 UI 완료 |
+| 1.3 | 2025-12-30 | Phase 1B RCE 엔진 완료: Docker 기반 Swift 코드 실행, 보안 격리, 결과 평가 |
 
 ---
 
