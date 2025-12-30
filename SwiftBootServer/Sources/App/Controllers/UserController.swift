@@ -11,6 +11,7 @@ struct UserController: RouteCollection {
         protected.patch("me", use: updateCurrentUser)
         protected.get("me", "stats", use: getUserStats)
         protected.get("me", "progress", use: getUserProgress)
+        protected.get("me", "progress", "courses", use: getCourseProgress)
     }
 
     /// 현재 사용자 조회
@@ -73,6 +74,38 @@ struct UserController: RouteCollection {
 
         return progress.map { ProgressResponse(from: $0) }
     }
+
+    /// 코스별 진행 상황
+    @Sendable
+    func getCourseProgress(req: Request) async throws -> [CourseProgressResponse] {
+        let userId = try req.requireAuthenticatedUserId()
+
+        // 모든 코스 조회
+        let courses = try await Course.query(on: req.db)
+            .with(\.$chapters) { chapter in
+                chapter.with(\.$lessons)
+            }
+            .all()
+
+        // 사용자의 완료된 레슨 ID 집합
+        let completedLessonIds = try await UserProgress.query(on: req.db)
+            .filter(\.$user.$id == userId)
+            .filter(\.$status == .completed)
+            .all()
+            .map { $0.$lesson.id }
+        let completedSet = Set(completedLessonIds)
+
+        // 각 코스별 진행률 계산
+        return courses.map { course in
+            let allLessons = course.chapters.flatMap { $0.lessons }
+            let completedCount = allLessons.filter { completedSet.contains($0.id!) }.count
+            return CourseProgressResponse(
+                courseId: course.id!,
+                completedLessons: completedCount,
+                totalLessons: allLessons.count
+            )
+        }
+    }
 }
 
 // MARK: - DTOs
@@ -126,4 +159,10 @@ struct ProgressResponse: Content {
         self.completedAt = progress.completedAt
         self.xpEarned = progress.xpEarned
     }
+}
+
+struct CourseProgressResponse: Content {
+    let courseId: UUID
+    let completedLessons: Int
+    let totalLessons: Int
 }
