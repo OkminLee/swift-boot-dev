@@ -2,7 +2,7 @@
 
 > Boot.dev를 벤치마킹한 Swift 기반 게이미피케이션 코딩 교육 플랫폼
 
-**문서 버전:** 1.5
+**문서 버전:** 1.6
 **최종 수정일:** 2025-12-30
 **배포 형태:** 웹 애플리케이션
 
@@ -15,8 +15,8 @@
 | **Phase 0** | 디자인 시스템 | 🟡 진행중 | 70% |
 | **Phase 1A** | 백엔드 MVP | ✅ 완료 | 100% |
 | **Phase 1B** | RCE 엔진 | ✅ 완료 | 100% |
-| **Phase 1C** | 웹 클라이언트 MVP | 🟢 거의완료 | 90% |
-| **Phase 2A** | 게이미피케이션 | ⬜ 대기 | 0% |
+| **Phase 1C** | 웹 클라이언트 MVP | ✅ 완료 | 100% |
+| **Phase 2A** | 게이미피케이션 | 🟡 진행중 | 40% |
 | **Phase 2B** | 콘텐츠 & 폴리싱 | ⬜ 대기 | 0% |
 | **Phase 2C** | 배포 | ⬜ 대기 | 0% |
 
@@ -46,12 +46,27 @@
   - 코스 상세 페이지: 레슨별 완료 체크마크, 챕터/코스 진행률 바
   - 코스 목록 페이지: 진행률 바, 완료 뱃지
   - 사이드바: 완료 레슨 수, XP 진행률 표시
+- ✅ **Zustand 전역 상태 관리** (React Context → Zustand 마이그레이션)
+  - auth-store.ts: 인증 상태, 레벨업 감지, 사용자 통계
+  - SSR/CSR 호환 isInitialized 패턴
+- ✅ **게이미피케이션 피드백 시스템**
+  - 정답 시 Confetti 파티클 효과 (canvas-confetti)
+  - 오답 시 화면 흔들림 애니메이션
+  - 레벨업 축하 모달 (황금빛 글로우, 별 장식)
+- ✅ **레슨 네비게이션 API**
+  - previousLessonId, nextLessonId 반환
+  - 이전/다음 레슨 버튼, 코스 완료 버튼
+- ✅ **에디터 개선**
+  - localStorage 자동 저장 (1초 debounce)
+  - 저장 상태 인디케이터
+  - Markdown 코드 블록 구문 강조 (react-syntax-highlighter)
 
 ### 다음 우선순위 작업
 
-1. 🔜 추가 언어 지원 (Python, Go, JavaScript Docker 이미지)
-2. 🔜 게이미피케이션 UI (레벨업 효과, Confetti)
-3. 🔜 Zustand 전역 상태 관리
+1. 🔜 추가 Swift 레슨 콘텐츠 작성
+2. 🔜 Gems 표시 UI 및 상점 페이지
+3. 🔜 Chest 개봉 모달 및 애니메이션
+4. 🔜 사운드 효과 (정답/오답/레벨업)
 
 ---
 
@@ -440,7 +455,7 @@ swiftboot-web/
 
 - [x] 인증 시스템 (자체 구현) *(swiftboot-web/src/lib/auth-context.tsx, github-oauth.ts)*
 - [x] API 클라이언트 *(swiftboot-web/src/lib/api.ts)*
-- [ ] 전역 상태 관리 (Zustand) - AuthContext로 대체 중
+- [x] 전역 상태 관리 (Zustand) *(stores/auth-store.ts - Context 마이그레이션 완료)*
 
 #### Week 10: Monaco Editor 통합
 
@@ -488,7 +503,7 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 
 - [x] XP 프로그레스 바 컴포넌트 *(사이드바에 구현)*
 - [x] 레벨 뱃지 컴포넌트 *(사이드바에 구현)*
-- [ ] 레벨업 모달 (애니메이션)
+- [x] 레벨업 모달 (애니메이션) *(LevelUpModal.tsx - 황금빛 글로우, confetti)*
 - [x] Streak 표시 (연속 학습) *(사이드바에 구현)*
 - [x] 사이드바 프로필 위젯 *(대시보드 레이아웃에 구현)*
 
@@ -515,15 +530,15 @@ Level 10→11: ~3,162 XP
 
 #### Week 14: 피드백 시스템
 
-- [ ] 정답 피드백
-  - [ ] Confetti 효과 (canvas-confetti)
+- [x] 정답 피드백
+  - [x] Confetti 효과 (canvas-confetti) *(lesson page에 구현)*
   - [ ] 성공 사운드
-  - [ ] XP 획득 애니메이션
-- [ ] 오답 피드백
-  - [ ] 화면 흔들림 (Framer Motion)
+  - [x] XP 획득 애니메이션 *(slideUp 애니메이션)*
+- [x] 오답 피드백
+  - [x] 화면 흔들림 (CSS animation) *(shake 애니메이션)*
   - [ ] 실패 사운드
-- [ ] 레벨업 피드백
-  - [ ] 전체 화면 골든 오버레이
+- [x] 레벨업 피드백
+  - [x] 전체 화면 골든 오버레이 *(LevelUpModal)*
   - [ ] 팡파레 사운드
 - [ ] 사운드 on/off 설정
 
@@ -709,6 +724,7 @@ jobs:
 | 1.3 | 2025-12-30 | Phase 1B RCE 엔진 완료: Docker 기반 Swift 코드 실행, 보안 격리, 결과 평가 |
 | 1.4 | 2025-12-30 | 사용자 진행률 시스템 완료: 코스별 진행률 API, 레슨 완료 UI, 사이드바 통계 |
 | 1.5 | 2025-12-30 | Phase 1A 완료: Redis 기반 Rate Limiting 미들웨어 (IP/사용자별, 엔드포인트별 설정) |
+| 1.6 | 2025-12-30 | Phase 1C 완료 & Phase 2A 진행: Zustand 마이그레이션, 게이미피케이션 피드백 (Confetti, 흔들림, 레벨업 모달), 레슨 네비게이션 API, 에디터 자동저장/구문강조 |
 
 ---
 
