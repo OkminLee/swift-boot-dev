@@ -5,8 +5,12 @@ struct LessonController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let lessons = routes.grouped("lessons")
 
+        // 레슨 조회는 인증 불필요
         lessons.get(":lessonId", use: getLesson)
-        lessons.post(":lessonId", "submit", use: submitLesson)
+
+        // 코드 제출은 인증 필요
+        let protected = lessons.grouped(JWTAuthMiddleware())
+        protected.post(":lessonId", "submit", use: submitLesson)
     }
 
     /// 레슨 상세 (학습 콘텐츠 포함)
@@ -32,18 +36,31 @@ struct LessonController: RouteCollection {
             throw Abort(.badRequest)
         }
 
+        // 인증된 사용자 확인
+        let userId = try req.requireAuthenticatedUserId()
+
+        // 레슨 조회
+        guard let lesson = try await Lesson.find(lessonId, on: req.db) else {
+            throw Abort(.notFound, reason: "레슨을 찾을 수 없습니다.")
+        }
+
+        // 코드 레슨인지 확인
+        guard lesson.type == .codeExercise || lesson.type == .codeOutput else {
+            throw Abort(.badRequest, reason: "코드 제출이 불가능한 레슨입니다.")
+        }
+
         let submission = try req.content.decode(CodeSubmission.self)
 
-        // TODO: 코드 실행 Job Queue에 추가
-        // 1. Redis Queue에 CodeExecutionJob 추가
-        // 2. Worker가 Docker 컨테이너에서 코드 실행
-        // 3. WebSocket으로 결과 스트리밍
-
-        return SubmissionResponse(
-            lessonId: lessonId,
-            status: .pending,
-            message: "Code execution queued"
+        // 코드 실행 서비스 호출
+        let executionService = CodeExecutionService()
+        let result = try await executionService.execute(
+            submission: submission,
+            lesson: lesson,
+            userId: userId,
+            db: req.db
         )
+
+        return result
     }
 }
 
