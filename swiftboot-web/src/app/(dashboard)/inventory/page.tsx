@@ -3,10 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, InventoryItem } from "@/lib/api";
+import { ChestOpenModal, ChestRarity } from "@/components/gamification/ChestOpenModal";
 
 export default function InventoryPage() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Chest 모달 상태
+  const [chestModalOpen, setChestModalOpen] = useState(false);
+  const [selectedChestRarity, setSelectedChestRarity] = useState<ChestRarity>("common");
 
   useEffect(() => {
     loadInventory();
@@ -21,6 +26,11 @@ export default function InventoryPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const openChest = (rarity: ChestRarity) => {
+    setSelectedChestRarity(rarity);
+    setChestModalOpen(true);
   };
 
   if (isLoading) {
@@ -43,7 +53,62 @@ export default function InventoryPage() {
         </p>
       </div>
 
+      {/* Chest Demo Section */}
+      <div className="mb-8 p-6 bg-gradient-to-r from-[var(--bg-secondary)] to-[var(--bg-elevated)] rounded-xl border border-[var(--border-default)]">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">📦</span>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+            보유 상자
+          </h2>
+          <span className="px-2 py-0.5 bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] text-xs rounded-full">
+            Demo
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Common Chest */}
+          <button
+            onClick={() => openChest("common")}
+            className="group flex flex-col items-center p-4 bg-[var(--bg-primary)] rounded-xl border-2 border-[var(--chest-common)]/30 hover:border-[var(--chest-common)] transition-all hover:scale-105"
+          >
+            <div className="text-5xl mb-2 group-hover:animate-chestShake">📦</div>
+            <span className="font-medium text-[var(--text-primary)]">일반 상자</span>
+            <span className="text-xs text-[var(--text-muted)] mt-1">클릭하여 열기</span>
+          </button>
+
+          {/* Rare Chest */}
+          <button
+            onClick={() => openChest("rare")}
+            className="group flex flex-col items-center p-4 bg-[var(--bg-primary)] rounded-xl border-2 border-[var(--chest-rare)]/30 hover:border-[var(--chest-rare)] transition-all hover:scale-105"
+          >
+            <div className="relative text-5xl mb-2 group-hover:animate-chestShake">
+              📦
+              <span className="absolute -top-1 -right-1 text-lg">💎</span>
+            </div>
+            <span className="font-medium text-[var(--chest-rare)]">희귀 상자</span>
+            <span className="text-xs text-[var(--text-muted)] mt-1">클릭하여 열기</span>
+          </button>
+
+          {/* Legendary Chest */}
+          <button
+            onClick={() => openChest("legendary")}
+            className="group flex flex-col items-center p-4 bg-[var(--bg-primary)] rounded-xl border-2 border-[var(--chest-legendary)]/30 hover:border-[var(--chest-legendary)] transition-all hover:scale-105"
+          >
+            <div className="relative text-5xl mb-2 group-hover:animate-chestShake">
+              📦
+              <span className="absolute -top-1 -right-1 text-lg">👑</span>
+            </div>
+            <span className="font-medium text-[var(--chest-legendary)]">전설 상자</span>
+            <span className="text-xs text-[var(--text-muted)] mt-1">클릭하여 열기</span>
+          </button>
+        </div>
+      </div>
+
       {/* Inventory Grid */}
+      <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
+        보유 아이템
+      </h2>
+
       {inventory.length === 0 ? (
         <div className="text-center py-16 bg-[var(--bg-secondary)] rounded-xl">
           <div className="text-6xl mb-4">🎒</div>
@@ -94,6 +159,13 @@ export default function InventoryPage() {
           ))}
         </div>
       )}
+
+      {/* Chest Open Modal */}
+      <ChestOpenModal
+        isOpen={chestModalOpen}
+        rarity={selectedChestRarity}
+        onClose={() => setChestModalOpen(false)}
+      />
     </div>
   );
 }
