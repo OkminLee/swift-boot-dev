@@ -11,6 +11,9 @@ enum Entrypoint {
 
         do {
             try await configure(app)
+            app.logger.info("Starting auto-migration...")
+            try await app.autoMigrate()
+            app.logger.info("Auto-migration completed successfully")
         } catch {
             app.logger.report(error: error)
             try? await app.asyncShutdown()

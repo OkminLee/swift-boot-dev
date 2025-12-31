@@ -1,14 +1,23 @@
 import Fluent
 import FluentPostgresDriver
 import JWT
-import Redis
+import NIOSSL
 import Vapor
 
 /// SwiftBoot 서버 설정
 func configure(_ app: Application) async throws {
     // MARK: - CORS
+    let allowedOrigin: CORSMiddleware.AllowOriginSetting
+    if let frontendURL = Environment.get("FRONTEND_URL") {
+        // 프로덕션: 특정 도메인만 허용
+        allowedOrigin = .custom(frontendURL)
+    } else {
+        // 개발: 모든 도메인 허용
+        allowedOrigin = .all
+    }
+
     let corsConfiguration = CORSMiddleware.Configuration(
-        allowedOrigin: .all,
+        allowedOrigin: allowedOrigin,
         allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
         allowedHeaders: [
             .accept,
@@ -24,6 +33,10 @@ func configure(_ app: Application) async throws {
     app.middleware.use(cors, at: .beginning)
 
     // MARK: - Database
+    // Supabase 연결을 위한 TLS 설정 (인증서 검증 비활성화)
+    var tlsConfig = TLSConfiguration.makeClientConfiguration()
+    tlsConfig.certificateVerification = .none
+
     app.databases.use(
         .postgres(
             configuration: SQLPostgresConfiguration(
@@ -32,16 +45,10 @@ func configure(_ app: Application) async throws {
                 username: Environment.get("DATABASE_USERNAME") ?? "swiftboot",
                 password: Environment.get("DATABASE_PASSWORD") ?? "swiftboot",
                 database: Environment.get("DATABASE_NAME") ?? "swiftboot",
-                tls: .prefer(try .init(configuration: .clientDefault))
+                tls: .require(try .init(configuration: tlsConfig))
             )
         ),
         as: .psql
-    )
-
-    // MARK: - Redis
-    app.redis.configuration = try RedisConfiguration(
-        hostname: Environment.get("REDIS_HOST") ?? "localhost",
-        port: Environment.get("REDIS_PORT").flatMap(Int.init) ?? 6379
     )
 
     // MARK: - JWT
