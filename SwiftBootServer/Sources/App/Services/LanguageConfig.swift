@@ -1,37 +1,32 @@
 import Vapor
 
-/// 프로그래밍 언어별 Docker 실행 설정
+/// 프로그래밍 언어별 실행 설정
 struct LanguageConfig {
     let language: ProgrammingLanguage
-    let dockerImage: String
     let fileExtension: String
-    let runCommand: String
+    let judge0LanguageId: Int
 
-    /// 언어별 설정 매핑
+    /// 언어별 설정 매핑 (Judge0 CE 언어 ID)
     static let configs: [ProgrammingLanguage: LanguageConfig] = [
         .swift: LanguageConfig(
             language: .swift,
-            dockerImage: "swiftlang/swift:nightly-6.0-jammy",
             fileExtension: "swift",
-            runCommand: "swift /app/main.swift"
+            judge0LanguageId: 83  // Swift 5.2.3
         ),
         .python: LanguageConfig(
             language: .python,
-            dockerImage: "python:3.12-slim",
             fileExtension: "py",
-            runCommand: "python3 /app/main.py"
+            judge0LanguageId: 100  // Python 3.12.5
         ),
         .go: LanguageConfig(
             language: .go,
-            dockerImage: "golang:1.22-alpine",
             fileExtension: "go",
-            runCommand: "go run /app/main.go"
+            judge0LanguageId: 107  // Go 1.23.5
         ),
         .javascript: LanguageConfig(
             language: .javascript,
-            dockerImage: "node:20-alpine",
             fileExtension: "js",
-            runCommand: "node /app/main.js"
+            judge0LanguageId: 102  // Node.js 22.08.0
         )
     ]
 

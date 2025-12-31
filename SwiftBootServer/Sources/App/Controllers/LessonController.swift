@@ -97,8 +97,8 @@ struct LessonController: RouteCollection {
 
         let submission = try req.content.decode(CodeSubmission.self)
 
-        // 코드 실행 서비스 호출
-        let executionService = CodeExecutionService()
+        // 코드 실행 서비스 호출 (Piston API 사용)
+        let executionService = CodeExecutionService(client: req.client)
         let result = try await executionService.execute(
             submission: submission,
             lesson: lesson,

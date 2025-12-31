@@ -5,14 +5,13 @@ import Vapor
 enum CodeExecutionError: Error, AbortError {
     case unsupportedLanguage
     case codeTooLong
-    case dockerNotAvailable
     case executionFailed(String)
 
     var status: HTTPResponseStatus {
         switch self {
         case .unsupportedLanguage, .codeTooLong:
             return .badRequest
-        case .dockerNotAvailable, .executionFailed:
+        case .executionFailed:
             return .internalServerError
         }
     }
@@ -23,8 +22,6 @@ enum CodeExecutionError: Error, AbortError {
             return "지원하지 않는 프로그래밍 언어입니다."
         case .codeTooLong:
             return "코드가 너무 깁니다. (최대 10,000자)"
-        case .dockerNotAvailable:
-            return "코드 실행 환경을 사용할 수 없습니다."
         case .executionFailed(let message):
             return "코드 실행 실패: \(message)"
         }
@@ -33,8 +30,12 @@ enum CodeExecutionError: Error, AbortError {
 
 /// 코드 실행 서비스
 struct CodeExecutionService {
-    private let dockerRunner = DockerRunner()
     private let maxCodeLength = 10_000
+    private let client: Client
+
+    init(client: Client) {
+        self.client = client
+    }
 
     /// 코드 실행 및 결과 평가
     func execute(
@@ -65,10 +66,11 @@ struct CodeExecutionService {
             )
         }
 
-        // 3. 코드 실행
-        let result: DockerRunner.ExecutionResult
+        // 3. 코드 실행 (Judge0 API)
+        let judge0Runner = Judge0Runner(client: client)
+        let result: Judge0Runner.ExecutionResult
         do {
-            result = try await dockerRunner.execute(code: submission.code, config: config)
+            result = try await judge0Runner.execute(code: submission.code, config: config)
         } catch {
             return SubmissionResponse(
                 lessonId: lessonId,
@@ -94,7 +96,7 @@ struct CodeExecutionService {
                 lessonId: lessonId,
                 status: .failure,
                 message: "코드 실행 중 오류가 발생했습니다.",
-                output: String(errorOutput.prefix(2000)) // 출력 길이 제한
+                output: String(errorOutput.prefix(2000))
             )
         }
 
