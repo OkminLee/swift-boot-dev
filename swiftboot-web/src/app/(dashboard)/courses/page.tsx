@@ -100,6 +100,28 @@ export default function CoursesPage() {
     );
   }
 
+  // 진행 중인 코스들 (시작했지만 완료하지 않은 코스)
+  const inProgressCourses = tracks
+    .flatMap((track) =>
+      track.courses.map((course) => ({
+        ...course,
+        trackTitle: track.title,
+        trackIcon: trackIcons[track.icon || ""] || trackIcons.default,
+        progress: courseProgressMap.get(course.id),
+      }))
+    )
+    .filter((course) => {
+      const p = course.progress;
+      return p && p.completedLessons > 0 && p.completedLessons < p.totalLessons;
+    })
+    .sort((a, b) => {
+      // 진행률이 높은 순서로 정렬
+      const aPercent = a.progress ? a.progress.completedLessons / a.progress.totalLessons : 0;
+      const bPercent = b.progress ? b.progress.completedLessons / b.progress.totalLessons : 0;
+      return bPercent - aPercent;
+    })
+    .slice(0, 3); // 최대 3개만 표시
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -109,6 +131,65 @@ export default function CoursesPage() {
           관심있는 분야를 선택하고 체계적으로 학습하세요
         </p>
       </div>
+
+      {/* 계속 학습하기 섹션 */}
+      {inProgressCourses.length > 0 && (
+        <section className="mb-12" aria-label="계속 학습하기">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl" aria-hidden="true">🔥</span>
+            <h2 className="text-xl font-bold text-[var(--text-primary)]">계속 학습하기</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {inProgressCourses.map((course) => {
+              const progressPercent = course.progress
+                ? (course.progress.completedLessons / course.progress.totalLessons) * 100
+                : 0;
+
+              return (
+                <Link
+                  key={course.id}
+                  href={`/courses/${course.id}`}
+                  className="group flex items-center gap-4 bg-[var(--bg-secondary)] border border-[var(--border-default)] rounded-xl p-4 hover:border-[var(--accent-primary)] transition-all hover:shadow-lg"
+                >
+                  {/* 아이콘 */}
+                  <div className="flex-shrink-0 w-12 h-12 bg-[var(--bg-elevated)] rounded-lg flex items-center justify-center">
+                    <span className="text-xl">{course.trackIcon}</span>
+                  </div>
+
+                  {/* 정보 */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--accent-primary)] transition-colors">
+                      {course.title}
+                    </h3>
+                    <div className="mt-1 flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[var(--accent-primary)] rounded-full transition-all"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-[var(--text-muted)] flex-shrink-0">
+                        {Math.round(progressPercent)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 화살표 */}
+                  <svg
+                    className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition-colors flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Tracks */}
       <div className="space-y-12">

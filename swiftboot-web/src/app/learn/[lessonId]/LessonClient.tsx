@@ -8,6 +8,7 @@ import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 import { ChestOpenModal } from "@/components/gamification/ChestOpenModal";
 import { useAuthStore } from "@/stores/auth-store";
 import { playSuccess, playError } from "@/lib/sounds";
+import { toast } from "@/stores/toast-store";
 import { MdxRenderer } from "@/components/mdx/MdxRenderer";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -219,17 +220,39 @@ export default function LessonClient() {
       const language = lesson.language || "swift";
       const response = await api.submitCode(lessonId, code, language as Language);
       setResult(response);
+
+      // 성공/실패에 따른 toast 알림
+      if (response.status === "success" && response.isCorrect) {
+        toast.success(`정답입니다! +${response.xpEarned || lesson.xpReward} XP`);
+      }
     } catch (err) {
       setResult({
         lessonId,
         status: "error",
         message: "제출 중 오류가 발생했습니다.",
       });
+      toast.error("코드 제출 중 오류가 발생했습니다.");
       console.error(err);
     } finally {
       setIsSubmitting(false);
     }
   }, [lesson, lessonId, code, isSubmitting]);
+
+  // Cmd+Enter / Ctrl+Enter 단축키로 코드 실행
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        const isCode = lesson?.type === "codeExercise" || lesson?.type === "codeOutput";
+        if (lesson && isCode && !isSubmitting) {
+          handleSubmit();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lesson, isSubmitting, handleSubmit]);
 
   // 코드 초기화 (저장된 코드도 삭제)
   const handleReset = useCallback(() => {
@@ -330,6 +353,8 @@ export default function LessonClient() {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-[var(--accent-primary)] text-white font-medium rounded-lg hover:bg-[var(--accent-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                title="⌘+Enter / Ctrl+Enter"
+                aria-label="코드 실행 (⌘+Enter)"
               >
                 {isSubmitting ? (
                   <>
@@ -338,11 +363,12 @@ export default function LessonClient() {
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    실행
+                    <span>실행</span>
+                    <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-xs bg-white/20 rounded">⌘↵</kbd>
                   </>
                 )}
               </button>
