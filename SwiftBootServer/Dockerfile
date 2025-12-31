@@ -55,5 +55,6 @@ ENV ENVIRONMENT=production
 EXPOSE 8080
 
 # 앱 실행
+# @main entrypoint -> configure() -> autoMigrate() -> serve
 ENTRYPOINT ["./App"]
 CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]
