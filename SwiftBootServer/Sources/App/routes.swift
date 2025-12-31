@@ -10,13 +10,13 @@ func routes(_ app: Application) throws {
         ["status": "healthy"]
     }
 
-    // API v1 routes - 기본 Rate Limit 적용
+    // API v1 routes - 메모리 기반 Rate Limit 적용 (Redis 불필요)
     let api = app.grouped("api", "v1")
-        .grouped(RateLimitMiddleware(config: .default))
+        .grouped(InMemoryRateLimitMiddleware(config: .default))
 
     // Auth routes - 더 엄격한 Rate Limit
     let authApi = app.grouped("api", "v1")
-        .grouped(RateLimitMiddleware(config: .auth))
+        .grouped(InMemoryRateLimitMiddleware(config: .auth))
     try authApi.register(collection: AuthController())
 
     // User routes
