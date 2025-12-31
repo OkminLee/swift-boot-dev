@@ -75,6 +75,9 @@ func configure(_ app: Application) async throws {
     app.migrations.add(SeedChest())
     app.migrations.add(UpdateLessonWithMdxComponents())
 
+    // 마이그레이션 자동 실행
+    try await app.autoMigrate()
+
     // MARK: - Routes
     try routes(app)
 }
