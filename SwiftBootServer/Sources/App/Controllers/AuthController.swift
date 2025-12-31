@@ -102,12 +102,16 @@ private extension AuthController {
             throw Abort(.internalServerError, reason: "GitHub OAuth not configured")
         }
 
+        let frontendUrl = Environment.get("FRONTEND_URL") ?? "https://swiftboot-web.pages.dev"
+        let redirectUri = "\(frontendUrl)/auth/callback"
+
         let response = try await req.client.post("https://github.com/login/oauth/access_token") { clientReq in
             clientReq.headers.add(name: .accept, value: "application/json")
             try clientReq.content.encode([
                 "client_id": clientId,
                 "client_secret": clientSecret,
-                "code": code
+                "code": code,
+                "redirect_uri": redirectUri
             ])
         }
 
