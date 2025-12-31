@@ -180,8 +180,11 @@ export function ChestOpenModal({
   // 모달 열릴 때 애니메이션 시작
   useEffect(() => {
     if (isOpen) {
-      setPhase("closed");
-      setShowRewards(false);
+      // 초기 상태 리셋 (비동기로 처리하여 cascading render 방지)
+      const resetTimer = setTimeout(() => {
+        setPhase("closed");
+        setShowRewards(false);
+      }, 0);
 
       // 상자 흔들림 후 열기
       const openTimer = setTimeout(() => {
@@ -196,12 +199,16 @@ export function ChestOpenModal({
       }, 1200);
 
       return () => {
+        clearTimeout(resetTimer);
         clearTimeout(openTimer);
         clearTimeout(rewardTimer);
       };
     } else {
-      setPhase("closed");
-      setShowRewards(false);
+      const resetTimer = setTimeout(() => {
+        setPhase("closed");
+        setShowRewards(false);
+      }, 0);
+      return () => clearTimeout(resetTimer);
     }
   }, [isOpen, fireChestConfetti]);
 
