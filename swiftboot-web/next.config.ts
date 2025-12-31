@@ -1,8 +1,15 @@
 import type { NextConfig } from "next";
+import { setupDevPlatform } from "@cloudflare/next-on-pages/next-dev";
+
+// Cloudflare Pages 개발 환경 설정
+if (process.env.NODE_ENV === "development") {
+  setupDevPlatform();
+}
 
 const nextConfig: NextConfig = {
-  // 이미지 최적화 설정
+  // 이미지 최적화 설정 (Cloudflare는 unoptimized 사용)
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -15,8 +22,6 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
-    // 이미지 포맷 최적화
-    formats: ["image/avif", "image/webp"],
   },
 
   // 실험적 기능
