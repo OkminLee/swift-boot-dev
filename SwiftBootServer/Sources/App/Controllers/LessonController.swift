@@ -11,7 +11,7 @@ struct LessonController: RouteCollection {
         // 코드 제출은 인증 + 엄격한 Rate Limit 적용
         let protected = lessons
             .grouped(JWTAuthMiddleware())
-            .grouped(RateLimitMiddleware(config: .codeExecution))
+            .grouped(InMemoryRateLimitMiddleware(config: .codeExecution))
         protected.post(":lessonId", "submit", use: submitLesson)
     }
 
